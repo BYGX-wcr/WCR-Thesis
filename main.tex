@@ -191,7 +191,7 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 
 \chapter{经典带权拥塞控制}\label{chapter:wcc}
 
-在加权公平性模型下，当两条权重分别为$w_1, w_2$的使用加增乘减机制的TCP流共享一个容量为$C$的瓶颈链路时，它们分到的带宽应该分别为$\frac{w_1}{w_1 + w_2}C$和$\frac{w_2}{w_1 + w_2}C$，即在稳态下它们分到的带宽应当与他们的权重成比例。
+在加权公平性模型下，当两条权重分别为$a_1, a_2$的使用加增乘减机制的TCP流共享一个容量为$C$的瓶颈链路时，它们分到的带宽应该分别为$\frac{a_1}{a_1 + a_2}C$和$\frac{a_2}{a_1 + a_2}C$，即在稳态下它们分到的带宽应当与他们的权重成比例。
 这也正是带权拥塞控制算法在该例子中应该达到的效果，而普通拥塞控制算法的效果则可以看成这两条流权重均为1时的情况。
 在这一节中，我将首先回顾一下两种代表性的带权拥塞控制算法MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{wischik2011design}，并提炼出它们设计思想的核心。
 
@@ -220,10 +220,10 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
   \begin{subfigure}{.4\textwidth}
     \centering
       \includegraphics[width=1\textwidth]{WReno-MD.pdf}
-      \caption{两条共享同一链路权重分别为$a_1$和$a_2$的WCC-MD流的加增乘减变化。}
+      \subcaption{两条共享同一链路权重分别为$a_1$和$a_2$的WCC-MD流的加增乘减变化。}
       \label{fig:WReno-MD}
   \end{subfigure}
-  \caption{}
+  \caption{几种基于加增乘减机制的典型带权拥塞控制算法运行抽象模拟图。}
 \label{fig:AIMD}
 \end{figure}
 % \begin{figure}[t]
@@ -260,22 +260,40 @@ MulTCP\cite{crowcroft1998differentiated}同时修改加增乘减机制的加增�
   $ \left\{
   \begin{aligned}
   cwnd & \to \frac{cwnd}{2} & cwnd < ssthresh \\
-  cwnd & \to \left( 1 - \frac{1}{2 w} \right) \cdot cwnd & otherwise\\
+  cwnd & \to \left( 1 - \frac{1}{2w} \right) \cdot cwnd & otherwise\\
   \end{aligned}
   \right.$ 
   当拥塞窗口$cwnd$大小大于或等于慢启动阈值$ssthresh$时，每探测到一次丢包，窗口大小就减少$\frac{1}{2w} \cdot cwnd$。若窗口大小小于慢启动阈值，则每对于每次丢包，窗口直接减半。
   %For each loss, the window size is cut down by half if $cwnd$ is less than the slow start threshold $ssthresh$. Otherwise, the window size is decreased by $\frac{1}{2 \cdot a_i} \cdot cwnd$.
 \end{itemize}
-现在我来解释一下MulTCP的设计思路。如果$n$条使用加增乘减机制的普通TCP流在一条瓶颈链路上互相竞争，则每一条都会获得链路带宽的$\frac{1}{n}$。因此，如果在该拥塞链路中一条流可以同时模拟$w$条流的行为，也就是使它成为$w$条流聚合而成的流，它将可以获得链路带宽的$\frac{w}{n}$。
+现在，我来解释一下MulTCP的设计思路。如果$n$条使用加增乘减机制的普通TCP流在一条瓶颈链路上互相竞争，则每一条都会获得链路带宽的$\frac{1}{n}$。
+因此，如果在该拥塞链路中一条流可以同时模拟$w$条流的行为，也就是使它成为$w$条流聚合而成的流，它将可以获得链路带宽的$\frac{w}{n}$。
 基于上述直觉，MulTCP在设计中企图使一条权重为$w$的TCP流的表现与$w$条普通TCP流的聚合一样。
 然而这一设想与传统加增乘减机制的直观理解\cite{chiu1989analysis}并不一致。
 如图\ref{fig:MulTCP}所示，两条MulTCP流的变化轨迹并不能收敛到加权公平线上，事实上其收敛处与加权公平线相距甚远。
 MulTCP的理论分析是基于传统的锯齿模型的，而锯齿模型已经被证实是极其不精确的\cite{alizadeh2011analysis}，所以其理论分析与现实是有偏差的。
 此外，启发MulTCP设计的直觉——用一条流来模拟多条流的聚合其实很难在现实中实现。
 其主要原因在于当多个丢包发生时，由于理应窗口减半的流的数目无法知悉，发送端很难准确地去测量多条TCP流应当减少的总拥塞窗口值。
+我将在第三章中指出MulTCP事实上是无法准确地实现加权公平性的。
 
 \section{EWTCP}
 
+EWTCP仅通过修改加增（AI）部分来实现加权公平性。对于一条权重为$w$的TCP流，EWTCP将AI的参数设定为$w^2$。
+一个权重为$w$的MulTCP流发送端的行为可以概括为：
+\begin{itemize}
+  \item {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w^2}{cwnd}$ \\
+  每收到一个ACK，拥塞窗口$cwnd$就增长$\frac{w^2}{cwnd}$。
+  % For each ACK, the congestion window $cwnd$ increases by $\frac{w^2}{cwnd}$.
+  \item {\bf Multiplicative Decrease:} $cwnd \leftarrow \frac{cwnd}{2}$ \\
+  每探测到一次丢包，拥塞窗口就减半。
+  % For each loss, the window size is cut down by half.
+\end{itemize}
+
+EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自于一个经典的TCP流带宽测量模型\cite{padhye1998modeling}。
+然而，这一模型在计算单次往返时间（RTT）时并没有考虑动态的排队时延，而是使用一个静态估计的平均值来带入公式中。
+现在的交换机都是配备了很大的缓冲区的\cite{Jim2012Bufferbloat}，忽视排队时延的动态变化会导致模型严重第偏离实际。
+此外，模型中假设一个RTT内任意两个包之间的丢包事件是相互独立的，但是这对于数据中心网络等私有网络环境来说是不符合实际的。
+图\ref{fig:EWTCP}也表明了EWTCP的表现与传统的理解是不一致的。
 
 \section{表格}
 
