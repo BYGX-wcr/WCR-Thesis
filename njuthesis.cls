@@ -457,6 +457,7 @@
 \captionsetup{font=small}
 \captionsetup[table]{position=top}
 \captionsetup[figure]{position=below}
+\renewcommand{\thesubfigure}{\Alph{subfigure}}
 \renewcommand*{\baselinestretch}{1.38}
 \let\convertergy@oldtabular\tabular
 \let\convertergy@endoldtabular\endtabular
