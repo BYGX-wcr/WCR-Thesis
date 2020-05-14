@@ -173,7 +173,7 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 \section{本文主要工作}
 本文旨在对几种代表性的加权拥塞控制算法进行仿真和分析，以期总结出基于AIMD的加权拥塞控制算法的一些特性和规律，并最终提升人们对于加权拥塞控制算法的理解，帮助网络工程师们了解如何在实践中应用加权拥塞控制。本文的主要工作如下：
 \begin{enumerate}
-\item 对MulTCP和EWTCP以及WCC-AI进行仿真
+\item 对MulTCP和EWTCP进行仿真
 
 \item 分析基于AIMD的带权拥塞控制算法的表现与交换机缓冲区大小、传播时延等环境变量之间的关系
 
@@ -189,11 +189,11 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 % 第四章：拟真实验验证
 % 第五章：总结与讨论
 
-\chapter{经典带权拥塞控制}\label{chapter:wcc}
+\chapter{带权拥塞控制}\label{chapter:wcc}
 
 在加权公平性模型下，当两条权重分别为$a_1, a_2$的使用加增乘减机制的TCP流共享一个容量为$C$的瓶颈链路时，它们分到的带宽应该分别为$\frac{a_1}{a_1 + a_2}C$和$\frac{a_2}{a_1 + a_2}C$，即在稳态下它们分到的带宽应当与他们的权重成比例。
 这也正是带权拥塞控制算法在该例子中应该达到的效果，而普通拥塞控制算法的效果则可以看成这两条流权重均为1时的情况。
-在这一节中，我将首先回顾一下两种代表性的带权拥塞控制算法MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{wischik2011design}，并提炼出它们设计思想的核心。
+在这一节中，我将首先回顾一下两种代表性的带权拥塞控制算法MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{wischik2011design}，并提炼出它们设计思想的核心，并给出基于AIMD的带权拥塞控制算法的基本形式。
 
 \begin{figure}[ht!]
   \centering
@@ -223,7 +223,11 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
       \subcaption{两条共享同一链路权重分别为$a_1$和$a_2$的WCC-MD流的加增乘减变化。}
       \label{fig:WReno-MD}
   \end{subfigure}
-  \caption{几种基于加增乘减机制的典型带权拥塞控制算法运行抽象模拟图。}
+  \caption{几种基于加增乘减机制的典型带权拥塞控制算法运行抽象模拟图。图中每一条轴代表了一条TCP流0-1标准化后的窗口大小。蓝色实线（高效线）代表链路带宽用满，蓝色虚线（加权公平线）代表两条流权重成比例。}
+  % Each axis corresponds to the window size of each source that is normalized to a number between 0 and 1 for convenience.
+  % If the point colored red lies in the blue solid line, this represents that one unit capacity is fully utilized, \ie, the sum of the obtained bandwidth for two flows is equal to one.
+  % 		If the point colored red lies in the blue dashed line, this indicates that the obtained bandwidth ratio for two flows is $a_1 : a_2$.
+  % 		The intersection of the blue solid line and dashed line is the optimal point to achieve efficiency and weighted proportionality.
 \label{fig:AIMD}
 \end{figure}
 % \begin{figure}[t]
@@ -293,88 +297,56 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 然而，这一模型在计算单次往返时间（RTT）时并没有考虑动态的排队时延，而是使用一个静态估计的平均值来带入公式中。
 现在的交换机都是配备了很大的缓冲区的\cite{Jim2012Bufferbloat}，忽视排队时延的动态变化会导致模型严重第偏离实际。
 此外，模型中假设一个RTT内任意两个包之间的丢包事件是相互独立的，但是这对于数据中心网络等私有网络环境来说是不符合实际的。
-图\ref{fig:EWTCP}也表明了EWTCP的表现与传统的理解是不一致的。
+图\ref{fig:EWTCP}也表明了EWTCP的表现与传统的理解是不一致的，其收敛点与最优点也相差甚远。
 
-\section{表格}
+\section{基于加增乘减的带权拥塞控制算法的基本形式}
 
-\begin{table}[htbp]
-\setlength{\belowcaptionskip}{7pt}
-  \centering
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-\hline 
-  &   & 国 & 内 & 企 & 业 & 包 & 括 & 许 & 多 \\ 
-\hline 
-  & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\ 
-\hline 
-国 & 1 & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\ 
-\hline 
-著 & 2 & 1 & 1 & 2 & 2 & 3 & 4 & 5 & 6 \\ 
-\hline
-\end{tabular} 
-\vspace{0.2cm}
-  \caption{编辑距离（乐文斯汀距离计算过程示例表格。字符串``国内企业包括许多''与``国著名括许多''乐文斯汀距离是3。}\label{table:ld}
-\end{table}
+仔细观察MulTCP和EWTCP的AIMD算法，其实可以发现它们都只是为加增乘减（AIMD的AI部分或MD部分配置了一个与流权重相关的因子。\cite{bansal2001binomial}中将包括AIMD在内的所有二项式拥塞控制算法做了一个形式化的描述。而对于基于AIMD的拥塞控制算法，我们也在此给出一个形式化的描述。对于一条权重为$w$的TCP流，基于AIMD的带权拥塞控制算法总是呈现出如下的形式：
+\begin{itemize}
+  \item {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w^\alpha}{cwnd}, \alpha \in \mathbb{R}$ \\
+  每收到一个ACK，拥塞窗口$cwnd$就增长$\frac{w^\alpha}{cwnd}$。
+  % For each ACK, the congestion window $cwnd$ increases by $\frac{w^2}{cwnd}$.
+  \item {\bf Multiplicative Decrease:} $cwnd \leftarrow cwnd (1 - \frac{w^{-\beta}}{2}), \beta \in \mathbb{R}$ \\
+  每探测到一次丢包，拥塞窗口就减少$\frac{w^{-\beta}}{2}$。
+  % For each loss, the window size is cut down by half.
+\end{itemize}
+也就是不同的基于AIMD的带权拥塞控制算法其实只是选择了不同的$\alpha$和$\beta$参数。
+那么基于\cite{chiu1989analysis}中的抽象模型来分析，其实直觉上最简单有效的带权拥塞控制算法应当为$\alpha=1,\beta=0$的WCC-AI和$\alpha=0,\beta=1$的WCC-MD。
+如图\ref{fig:WReno-AI}和\ref{fig:WReno-MD}中所示，WCC-AI和WCC-MD的收敛点都基本位于最优点附近。
+此外，WCC-AI与WCC-MD其实可以说是最基本的两种带权拥塞控制算法，MulTCP其实可以看成WCC-AI和WCC-MD的叠加，EWTCP其实可以看成一个WCC-AI使用了真实权重的平方来作为算法权重参数。
+为了更全面地考虑基于加增乘减的带权拥塞控制算法，接下来的文章中我也将会把WCC-AI和WCC-MD纳入分析。
 
+\chapter{仿真与分析}\label{chapter:analysis}
 
-\section{算法}
-
-\begin{algorithm}
-\caption{Beam Search}
-\label{alg:beam}
-\begin{algorithmic}[1]
-\STATE {将初始节点插入到集束中。} 
-\WHILE{遍历未结束}
-\STATE {遍历集束中所有节点的后续节点。} 
-\IF{该节点是目标节点}
-\STATE {算法结束。}
-\ELSE 
-\STATE {扩展该节点，取集束宽度的节点入堆。}
-\ENDIF
-\ENDWHILE
-\end{algorithmic}
-\end{algorithm}
-
-集束宽度可以在搜索过程中保持为一个定值，也可以根据搜索的进行而变化。搜索算法可以根据搜索的结果进行调整，比如，当以一个小的集束宽度搜索解却无法找到适合解的时候，可以增大集束宽度重新进行一次搜索。
-
-
-
-\chapter{实验}
-
-\section{实现细节}
-我们在Tensorflow框架上实现了我们的网络系统。实验在一个搭载2.40GHz 英特尔志强 Xeon E5-2673 CPU，32GB RAM 和一块英伟达1080Ti 12GB 显存的服务器电脑上运行。网络系统使用Adam训练算法。
-
-
-
-\section{文本分行结果}
-尽管如此，在局部损失切割和局部水平投影切割之后，每一个竖直段的分行结果的对应关系却很难处理。在一些特殊情况下，无法做到每一竖直段分行关系的对应。所以这两个方法不适用。
-
-
-
-
-\section{识别结果}
-
-\subsection{准确率}
-我们根据数据集中人的笔迹将数据集分为了\textbf{HWDB1}-\textbf{HWDB3}，并实现了Wang 等人\cite{wang2012end} 和Mishra 等人\cite{mishra2012scene}的方法，通过调用百度的文字识别系统\cite{baiduapi},进行对比实验得到以下结果。
-
-\vspace{0.2cm}
-\begin{table}[htbp]
-\setlength{\belowcaptionskip}{5pt}
-  \centering
-  \begin{tabular}{cccc}
-    \toprule
-    \textbf{方法} & \textbf{HWDB1} & \textbf{HWDB2} & \textbf{HWDB3} \\
-    \midrule
-    Wang 等人\cite{wang2012end}   			& 74.0 & 60.0 & 68.0  \\
-    Mishra 等人\cite{mishra2012scene}		 	& 80.8 & 63.6 & 73.5  \\
-    百度通用文字识别\cite{baiduapi}		& 64.8 & 36.8 & 60.8 \\
-    \midrule
-    我们的方法（没有字典信息）& 81.5 & 67.5 & 73.6  \\
-    我们的方法	  		& \textbf{81.8} & \textbf{67.8} & \textbf{73.9}  \\
-    \bottomrule
-  \end{tabular}
-  \vspace{0.2cm}
-  \caption{识别准确率}\label{table:result}
-\end{table}
+\begin{figure*}[ht]
+	\centering
+  \begin{subfigure}{.6\textwidth}
+    \centering
+		\includegraphics[width=3.2in]{multcp-dynamic.pdf}
+    \label{fig:MulTCPPerformance}
+    \caption{MulTCP流仿真带宽图}
+  \end{subfigure}
+  \begin{subfigure}{.6\textwidth}
+    \centering
+		\includegraphics[width=3.2in]{ewtcp-dynamic.pdf}
+    \label{fig:EWTCPPerformance}
+    \caption{EWTCP流仿真带宽图}
+	\end{subfigure}
+  \begin{subfigure}{.6\textwidth}
+    \centering
+		\includegraphics[width=3.2in]{wrenoai-dynamic.pdf}
+    \label{fig:WReno-AIPerformance}
+    \caption{WCC-AI流仿真带宽图}
+  \end{subfigure}
+  \begin{subfigure}{.6\textwidth}
+    \centering
+		\includegraphics[width=3.2in]{wrenomd-dynamic.pdf}
+    \label{fig:WReno-AIPerformance}
+    \caption{WCC-MD流仿真带宽图}
+	\end{subfigure}
+	\caption{四种典型带权拥塞控制算法的仿真结果。紫、黄、红、蓝四种颜色的线分别对应于权重为4，3，2，1的TCP流。}
+	\label{fig:Performance}
+\end{figure*}
 
 
 
