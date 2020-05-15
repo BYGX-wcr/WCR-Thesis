@@ -173,11 +173,11 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 \section{本文主要工作}
 本文旨在对几种代表性的加权拥塞控制算法进行仿真和分析，以期总结出基于AIMD的加权拥塞控制算法的一些特性和规律，并最终提升人们对于加权拥塞控制算法的理解，帮助网络工程师们了解如何在实践中应用加权拥塞控制。本文的主要工作如下：
 \begin{enumerate}
-\item 对MulTCP和EWTCP进行仿真
+\item 对MulTCP和EWTCP进行仿真和拟真实验
 
-\item 分析基于AIMD的带权拥塞控制算法的表现与交换机缓冲区大小、传播时延等环境变量之间的关系
+\item 分析典型带权拥塞控制算法的表现
 
-\item 使用拟真实验来验证上述分析得出的结论。
+\item 总结基于AIMD的带权拥塞控制算法的加权公平性与环境变量之间的关系。
 \end{enumerate}
 
 % \section{本文结构}
@@ -316,9 +316,9 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 此外，WCC-AI与WCC-MD其实可以说是最基本的两种带权拥塞控制算法，MulTCP其实可以看成WCC-AI和WCC-MD的叠加，EWTCP其实可以看成一个WCC-AI使用了真实权重的平方来作为算法权重参数。
 为了更全面地考虑基于加增乘减的带权拥塞控制算法，接下来的文章中我也将会把WCC-AI和WCC-MD纳入分析。
 
-\chapter{仿真与分析}\label{chapter:analysis}
+\chapter{实验与分析}\label{chapter:analysis}
 
-\begin{figure*}[ht]
+\begin{figure*}[tp]
 	\centering
   \begin{subfigure}{.6\textwidth}
     \centering
@@ -349,6 +349,51 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 \end{figure*}
 
 
+在这章中，首先我将使用NS3仿真器\cite{NS3}对四种典型带权拥塞控制算法进行仿真，并根据仿真结果对它们进行分析。然后，我将会使用一些拟真实验来验证我分析出的一些想法。
+
+\section{仿真实验}
+
+\textbf{环境配置：}
+在NS3仿真器中，我将MulTCP，EWTCP，WCC-AI和WCC-MD实现为ns3::TcpNewReno的子类，并在仿真实验中根据需求做出相应的调用。默认情况下，链路的带宽设置为10$Gbps$，链路的传播时延设置为20$\mu s$，交换机缓冲区的大小设置为200$KBytes$，选择ACK选项也默认开启。
+
+\textbf{带权拥塞控制算法确实可以实现差异化带宽分配，但是它们的加权公平性并不完美：}
+如图\ref{fig:Performance}所示，即使在动态的流模式中，四种带权拥塞控制算法也都成功地实现了使权重不同的流获得不同份额的带宽，而且四种算法由一个收敛状态转换到另一个收敛状态的速度都很快。
+但是，仔细检查图中各条流的带宽可以发现使用MulTCP和EWTCP的实验中，四条流的带宽比并不是等于它们的权重比的。
+反倒是WCC-AI和WCC-MD的四条流的带宽比基本接近它们的权重比。
+这似乎表明MulTCP和EWTCP不能达到精确的加权公平性，而WCC-AI和WCC-MD可以达到较为精确的加权公平性。
+然而，我换了不同的环境参数（如：交换机缓冲区大小，链路时延，链路带宽等），做了多次不同的实验后，发现事实上无论是这四种带权拥塞控制算法中的哪一种，都可以在特定的网络环境下达到精确的加权公平性，但在某些网络环境条件下它们都无法达到精确的加权公平性。
+这也意味着，这四种典型的基于加增乘减的带权拥塞控制算法都可以实现流级的差异化带宽分配，但是它们的加权公平性（或者说它们的带宽分配结果）是不完美的。
+更为准确地说，它们的加权公平性是会随着网络环境的变化而变化的。
+我将会在节\ref{sec:emulation}中更为详细地说明这一点，并给出基于AIMD的带权拥塞控制算法的加权公平性随环境变量变化的规律。
+
+\begin{figure}[ht]
+	\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=2.8in]{bounded.pdf}
+    \caption{RWND最大为131$KBytes$}
+		\label{fig:BoundedCwnd}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+    \includegraphics[width=2.8in]{unbounded.pdf}
+    \caption{RWND接近无穷大}
+		\label{fig:UnbounedCwnd}
+  \end{subfigure}
+	\caption{接收端窗口大小对加权公平性的影响.}
+	\label{fig:EndHostBuffer}
+\end{figure}
+
+\textbf{接收端窗口大小也会影响带权拥塞控制的加权公平性：}
+在仿真实验中，我发现不仅带宽和时延等典型的网络环境变量会影响加权公平性，接收端窗口（RWND）大小也会影响带权拥塞控制的加权公平性。
+以WCC-AI为例，如图\ref{fig:EndHostBuffer}所示，我在仿真器中生成了三条权重分别为1、2、3的流并使它们在一个带宽为1$Gbps$的链路上互相竞争。
+图\ref{fig:BoundedCwnd}展示了当RWND被限制在131$KBytes$时三条流的拥塞窗口（CWND）变化。
+在三条流的往返时间一致的情况下，三条流的CWND的比值就等同于它们带宽的比值，也就是CWND反映了这三条流的带宽。
+可以发现当RWND成为瓶颈，也就是权重较大的流的拥塞窗口会被RWND限制住时，两条权重不一样的流即使最开始获得了不同的带宽，最终也会收敛到二者带宽相等的情况。
+图\ref{fig:UnbounedCwnd}展示了当我把RWND调到极大（可以理解为无穷大）时这三条流运行的情况。
+可以发现三条流的运行又恢复正常了，当最终收敛时三条流的CWND值接近达到三条流的权重比$1:2:3$，即它们的带宽又满足加权公平性了。
+
+\section{拟真实验}
+\label{sec:emulation}
 
 \chapter{总结与讨论}
 在本文中，我们使用预处理层-卷积层-循环卷积层-转录层网络来处理手写中文文本识别的问题。这种网络很好地结合了卷积网络和循环网络各自的优势。
