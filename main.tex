@@ -352,6 +352,7 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 在这章中，首先我将使用NS3仿真器\cite{NS3}对四种典型带权拥塞控制算法进行仿真，并根据仿真结果对它们进行分析。然后，我将会使用一些拟真实验来验证我分析出的一些想法。
 
 \section{仿真实验}
+\label{sec:simulation}
 
 \textbf{环境配置：}
 在NS3仿真器中，我将MulTCP，EWTCP，WCC-AI和WCC-MD实现为ns3::TcpNewReno的子类，并在仿真实验中根据需求做出相应的调用。默认情况下，链路的带宽设置为10$Gbps$，链路的传播时延设置为20$\mu s$，交换机缓冲区的大小设置为200$KBytes$，选择ACK选项也默认开启。
@@ -359,12 +360,13 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 \textbf{带权拥塞控制算法确实可以实现差异化带宽分配，但是它们的加权公平性并不完美：}
 如图\ref{fig:Performance}所示，即使在动态的流模式中，四种带权拥塞控制算法也都成功地实现了使权重不同的流获得不同份额的带宽，而且四种算法由一个收敛状态转换到另一个收敛状态的速度都很快。
 但是，仔细检查图中各条流的带宽可以发现使用MulTCP和EWTCP的实验中，四条流的带宽比并不是等于它们的权重比的。
-反倒是WCC-AI和WCC-MD的四条流的带宽比基本接近它们的权重比。
+反倒是最基础的WCC-AI和WCC-MD的四条流的带宽比基本接近它们的权重比。
 这似乎表明MulTCP和EWTCP不能达到精确的加权公平性，而WCC-AI和WCC-MD可以达到较为精确的加权公平性。
 然而，我换了不同的环境参数（如：交换机缓冲区大小，链路时延，链路带宽等），做了多次不同的实验后，发现事实上无论是这四种带权拥塞控制算法中的哪一种，都可以在特定的网络环境下达到精确的加权公平性，但在某些网络环境条件下它们都无法达到精确的加权公平性。
 这也意味着，这四种典型的基于加增乘减的带权拥塞控制算法都可以实现流级的差异化带宽分配，但是它们的加权公平性（或者说它们的带宽分配结果）是不完美的。
 更为准确地说，它们的加权公平性是会随着网络环境的变化而变化的。
 我将会在节\ref{sec:emulation}中更为详细地说明这一点，并给出基于AIMD的带权拥塞控制算法的加权公平性随环境变量变化的规律。
+此外，从仿真结果中可以看出WCC-MD的表现与WCC-AI几乎完全相同，所以在接下来的内容中我将不再呈现WCC-MD的仿真结果，不过我们之后的讨论与分析还会涉及到它。
 
 \begin{figure}[ht]
 	\begin{subfigure}{.5\textwidth}
@@ -391,6 +393,85 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 可以发现当RWND成为瓶颈，也就是权重较大的流的拥塞窗口会被RWND限制住时，两条权重不一样的流即使最开始获得了不同的带宽，最终也会收敛到二者带宽相等的情况。
 图\ref{fig:UnbounedCwnd}展示了当我把RWND调到极大（可以理解为无穷大）时这三条流运行的情况。
 可以发现三条流的运行又恢复正常了，当最终收敛时三条流的CWND值接近达到三条流的权重比$1:2:3$，即它们的带宽又满足加权公平性了。
+
+\begin{table}[h]
+	\caption{图\ref{fig:CackSackDiff}中5秒仿真内的各条流平均带宽比。}
+	\label{tab:CackSackDiff}
+	\centering
+	\begin{tabular}{c|cc}
+		\hline
+		\multirow{2}{*}{CC Scheme} & \multicolumn{2}{c}{五条流的平均带宽比} \\
+		\cline{2-3} & SACK & Non-SACK \\
+		\hline
+		NewReno~\cite{Henderson2012NewReno} & 1:1.01:1.01:1.03:1.02 & 1:1.04:1.07:0.74:0.92 \\
+		MulTCP~\cite{crowcroft1998differentiated} & 1:3.67:8.81:16.03:24.96 & 1:1.10:1.36:1.54:1.55 \\
+		EWTCP~\cite{Honda2009EWTCP} & 1:2.38:5.30:9.37:13.21 & 1:2.81:3.15:3.28:3.53\\
+		WCC-AI & 1:1.65:2.50:3.33:4.14 & 1:1.44:2.48:2.56:3.10\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{figure}[ht!]
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{reno-cack.pdf}
+    \label{fig:renoCack}
+    \caption{使用累积ACK的NewReno流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.6in]{reno-sack.pdf}
+    \label{fig:renoSack}
+    \caption{使用选择ACK的NewReno流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{multcp-cack.pdf}
+    \label{fig:multcpCack}
+    \caption{使用累积ACK的MulTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{multcp-sack.pdf}
+    \label{fig:multcpSack}
+    \caption{使用选择ACK的MulTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{ewtcp-cack.pdf}
+    \label{fig:ewtcpCack}
+    \caption{使用累积ACK的EWTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{ewtcp-sack.pdf}
+    \label{fig:ewtcpSack}
+    \caption{使用选择ACK的EWTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{wreno-cack.pdf}
+    \label{fig:wrenoCack}
+    \caption{使用累积ACK的WCC-AI流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.5in]{wreno-sack.pdf}
+    \label{fig:wrenoSack}
+    \caption{使用选择ACK的WCC-AI流}
+  \end{subfigure}
+	\caption{NewReno普通拥塞控制和MulTCP、EWTCP、WCC-AI三种带权拥塞控制算法与两种ACK选项的对比仿真。}
+	\label{fig:CackSackDiff}
+\end{figure}
+
+\textbf{选择ACK和累积ACK选项对带权拥塞控制算法的加权公平性也有显著影响：}
+我运用仿真实验检查了普通拥塞控制的代表NewReno和MulTCP、EWTCP、WCC-AI三种基于加增乘减的带权拥塞控制算法的（加权）公平性与ACK机制的关系，结果如图\ref{fig:CackSackDiff}和表\ref{tab:CackSackDiff}所示。
+我们可以观察到对于普通拥塞控制算法NewReno来说，虽然选择ACK能够减少其流的带宽波动，但是从长期来看ACK选项并没有严重地影响其公平性——当开启选择ACK时，五条流的带宽比接近$1:1:1:1:1$；当使用累积ACK时，五条流的带宽比稍有变化，但是仍基本维持在原值左右。
+然而，对于带权拥塞控制算法，ACK选项则会对其加权公平性产生显著的影响。
+如表\ref{tab:CackSackDiff}中第二行所示，当使用选择ACK时，权重最大的MulTCP流与权重最小的MulTCP流的带宽比接近$1:25$，而当使用累积ACK时，这一比值就降到了接近$1:1.5$。
+EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但是其加权公平性的准确度还是降低了的。
+我觉得这种意料之外的影响应该是因为累积ACK会导致过多的重传事件发生\cite{Mathis1996SACK}，这会使窗口剧烈波动，从而对拥塞控制算法的稳态产生影响。
+当流的拥塞控制算法基本遵循AIMD的规则时，流受到的影响比较小，如NewReno和WCC-AI的流；当流的拥塞控制算法与AIMD的规则差别较大时，其窗口变动会较为剧烈，流受到的影响就会比较大，如MulTCP和EWTCP的流。
 
 \section{拟真实验}
 \label{sec:emulation}
