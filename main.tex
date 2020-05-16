@@ -366,7 +366,7 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 这也意味着，这四种典型的基于加增乘减的带权拥塞控制算法都可以实现流级的差异化带宽分配，但是它们的加权公平性（或者说它们的带宽分配结果）是不完美的。
 更为准确地说，它们的加权公平性是会随着网络环境的变化而变化的。
 我将会在节\ref{sec:emulation}中更为详细地说明这一点，并给出基于AIMD的带权拥塞控制算法的加权公平性随环境变量变化的规律。
-此外，从仿真结果中可以看出WCC-MD的表现与WCC-AI几乎完全相同，所以在接下来的内容中我将不再呈现WCC-MD的仿真结果，不过我们之后的讨论与分析还会涉及到它。
+此外，从仿真结果中可以看出WCC-MD的表现与WCC-AI大致相同，所以在接下来的内容中我将不再呈现WCC-MD的实验结果，不过我们之后的讨论与分析还会涉及到它。
 
 \begin{figure}[ht]
 	\begin{subfigure}{.5\textwidth}
@@ -394,6 +394,59 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 图\ref{fig:UnbounedCwnd}展示了当我把RWND调到极大（可以理解为无穷大）时这三条流运行的情况。
 可以发现三条流的运行又恢复正常了，当最终收敛时三条流的CWND值接近达到三条流的权重比$1:2:3$，即它们的带宽又满足加权公平性了。
 
+\begin{figure}[ht!]
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{reno-cack.pdf}
+    \label{fig:renoCack}
+    \caption{使用累积ACK的NewReno流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.4in]{reno-sack.pdf}
+    \label{fig:renoSack}
+    \caption{使用选择ACK的NewReno流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{multcp-cack.pdf}
+    \label{fig:multcpCack}
+    \caption{使用累积ACK的MulTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{multcp-sack.pdf}
+    \label{fig:multcpSack}
+    \caption{使用选择ACK的MulTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{ewtcp-cack.pdf}
+    \label{fig:ewtcpCack}
+    \caption{使用累积ACK的EWTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{ewtcp-sack.pdf}
+    \label{fig:ewtcpSack}
+    \caption{使用选择ACK的EWTCP流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{wreno-cack.pdf}
+    \label{fig:wrenoCack}
+    \caption{使用累积ACK的WCC-AI流}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{wreno-sack.pdf}
+    \label{fig:wrenoSack}
+    \caption{使用选择ACK的WCC-AI流}
+  \end{subfigure}
+	\caption{NewReno普通拥塞控制和MulTCP、EWTCP、WCC-AI三种带权拥塞控制算法与两种ACK选项的对比仿真。}
+	\label{fig:CackSackDiff}
+\end{figure}
+
 \begin{table}[h]
 	\caption{图\ref{fig:CackSackDiff}中5秒仿真内的各条流平均带宽比。}
 	\label{tab:CackSackDiff}
@@ -411,59 +464,6 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 	\end{tabular}
 \end{table}
 
-\begin{figure}[ht!]
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{reno-cack.pdf}
-    \label{fig:renoCack}
-    \caption{使用累积ACK的NewReno流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.6in]{reno-sack.pdf}
-    \label{fig:renoSack}
-    \caption{使用选择ACK的NewReno流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{multcp-cack.pdf}
-    \label{fig:multcpCack}
-    \caption{使用累积ACK的MulTCP流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{multcp-sack.pdf}
-    \label{fig:multcpSack}
-    \caption{使用选择ACK的MulTCP流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{ewtcp-cack.pdf}
-    \label{fig:ewtcpCack}
-    \caption{使用累积ACK的EWTCP流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{ewtcp-sack.pdf}
-    \label{fig:ewtcpSack}
-    \caption{使用选择ACK的EWTCP流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{wreno-cack.pdf}
-    \label{fig:wrenoCack}
-    \caption{使用累积ACK的WCC-AI流}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.5in]{wreno-sack.pdf}
-    \label{fig:wrenoSack}
-    \caption{使用选择ACK的WCC-AI流}
-  \end{subfigure}
-	\caption{NewReno普通拥塞控制和MulTCP、EWTCP、WCC-AI三种带权拥塞控制算法与两种ACK选项的对比仿真。}
-	\label{fig:CackSackDiff}
-\end{figure}
-
 \textbf{选择ACK和累积ACK选项对带权拥塞控制算法的加权公平性也有显著影响：}
 我运用仿真实验检查了普通拥塞控制的代表NewReno和MulTCP、EWTCP、WCC-AI三种基于加增乘减的带权拥塞控制算法的（加权）公平性与ACK机制的关系，结果如图\ref{fig:CackSackDiff}和表\ref{tab:CackSackDiff}所示。
 我们可以观察到对于普通拥塞控制算法NewReno来说，虽然选择ACK能够减少其流的带宽波动，但是从长期来看ACK选项并没有严重地影响其公平性——当开启选择ACK时，五条流的带宽比接近$1:1:1:1:1$；当使用累积ACK时，五条流的带宽比稍有变化，但是仍基本维持在原值左右。
@@ -475,6 +475,128 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 
 \section{拟真实验}
 \label{sec:emulation}
+
+仿真实验缺乏随机性，所以在这一节中我采用了拟真实验来更好地验证带权拥塞控制的加权公平性随环境变量变化的规律。我使用了三台搭载Intel Xeon处理器、运行Linux系统的DELL服务器和一台Mellanox交换机来搭建了拟真实验环境。我将MulTCP，EWTCP和WCC-AI都基于原有的内核代码实现为新的内核拥塞控制模块并载入三台服务器的内核中。我使用Iperf\cite{iperf}来产生TCP流量和调用所需的拥塞控制算法，使两条使用带权拥塞控制的TCP流通过一条10$Gbps$的拥塞链路到达接收主机上。
+
+\begin{figure*}[ht]
+	%Buffer size: 2MB
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{AI-Testbed-Trace.pdf}
+    \label{fig:AI-TestbedTrace}
+    \caption{WCC-AI拟真实验流带宽动态图（使用DropTail队列）}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{AI-Testbed-Summary.pdf}
+    \label{fig:AI-TestbedSum}
+    \caption{WCC-AI拟真实验流总带宽动统计图（使用DropTail队列）}
+  \end{subfigure}
+  %Threshold: min-1MB max-5MB
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{RED-AI-Testbed-Trace.pdf}
+    \label{fig:RED-AI-TestbedTrace}
+    \caption{WCC-AI拟真实验流带宽动态图（使用RED队列）}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{RED-AI-Testbed-Summary.pdf}
+    \label{fig:RED-AI-TestbedSum}
+    \caption{WCC-AI拟真实验流总带宽动统计图（使用RED队列）}
+  \end{subfigure}
+	% %Buffer size: 2MB
+	% \begin{subfigure}{.5\textwidth}
+  %   \centering
+	% 	\includegraphics[width=2.5in]{CACK-AI-Testbed-Trace.pdf}
+	% 	\label{fig:CACK-AI-TestbedTrace}
+  % \end{subfigure}
+	% \begin{subfigure}{.5\textwidth}
+  %   \centering
+	% 	\includegraphics[width=2.5in]{CACK-AI-Testbed-Summary.pdf}
+	% 	\label{fig:CACK-AI-TestbedSum}
+  % \end{subfigure}
+	% %Threshold: min-1MB max-5MB
+	% \begin{subfigure}{.5\textwidth}
+  %   \centering
+	% 	\includegraphics[width=2.5in]{RED-CACK-AI-Testbed-Trace.pdf}
+	% 	\label{fig:RED-CACK-AI-TestbedTrace}
+  % \end{subfigure}
+	% \begin{subfigure}{.5\textwidth}
+  %   \centering
+	% 	\includegraphics[width=2.5in]{RED-CACK-AI-Testbed-Summary.pdf}
+	% 	\label{fig:RED-CACK-AI-TestbedSum}
+  % \end{subfigure}
+  \caption{两条权重分别为1和2的WCC-AI流的拟真实验结果。尾部丢包（DropTail）队列的上限为2$MBytes$，早期随机丢包（RED）队列的下阈值为1$Mbytes$，上阈值为5$Mbytes$.}
+	\label{fig:TestbedExp}
+\end{figure*}
+
+\begin{figure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Trace.pdf}
+    \label{fig:MulTCP-2M-TestbedTrace}
+    \caption{MulTCP拟真实验流带宽动态图}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Summary.pdf}
+    \label{fig:MulTCP-2M-TestbedSum}
+    \caption{MulTCP拟真实验流总带宽动统计图}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Trace.pdf}
+    \label{fig:EWTCP-2M-TestbedTrace}
+    \caption{EWTCP拟真实验流带宽动态图}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Summary.pdf}
+    \label{fig:EWTCP-2M-TestbedSum}
+    \caption{EWTCP拟真实验流总带宽动统计图}
+  \end{subfigure}
+  \label{fig:PreWorkTrace}
+  \caption{两条权重分别为1和2的流使用分别使用MulTCP和EWTCP的拟真实验结果。}
+\end{figure}
+
+\textbf{带权拥塞控制算法在拟真实验环境中也可以实现加权公平性：}以WCC-AI为例，从图\ref{fig:TestbedExp}中的拟真实验结果可以看出，在拟真实验环境中WCC-AI也可以达到近乎完美的加权公平性并在长期中保持着良好的稳定性。
+如图\ref{fig:AI-TestbedSum}所示，在整个100s的实验中两条流的长期平均带宽比极其接近其权重比$1:2$。
+我还测试了一下早期随机丢包（RED）队列对带权拥塞控制算法的影响。
+从图\ref{fig:RED-AI-TestbedTrace}中可以发现，虽然使用RED队列引入了更多的波动，但是WCC-AI在大多数时候也还是能够近似地维持着两条流的加权公平性。
+同样地，MulTCP和EWTCP在相同的拟真实验环境中也可以实现差异化带宽分配，但是其加权公平性并不完美。
+如图\ref{fig:PreWorkTrace}所示，在流带宽动态图中可以发现，MulTCP和EWTCP各自两条流的带宽离它们应该达到的目标值都有一定的距离。
+
+\begin{figure*}[ht]
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{MulTCP-ThroughputVar.pdf}
+    \label{fig:MulTCP-ThroughputVar}
+    \caption{两条MulTCP流带宽随交换机缓冲区大小变化图}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{MulTCP-RatioVar.pdf}
+    \label{fig:MulTCP-RatioVar}
+    \caption{两条MulTCP流带宽比值随交换机缓冲区大小变化图}
+  \end{subfigure}	
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{EWTCP-ThroughputVar.pdf}
+    \label{fig:EWTCP-ThroughputVar}
+    \caption{两条EWTCP流带宽随交换机缓冲区大小变化图}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{EWTCP-RatioVar.pdf}
+    \label{fig:EWTCP-RatioVar}
+    \caption{两条EWTCP流带宽比值随交换机缓冲区大小变化图}
+  \end{subfigure}
+	\caption{权重分别为1和2的两条MulTCP和EWTCP流的带宽及其比值随交换机缓冲区大小变化图。
+	}
+	\label{fig:PreWorkVar}
+\end{figure*}
+
 
 \chapter{总结与讨论}
 在本文中，我们使用预处理层-卷积层-循环卷积层-转录层网络来处理手写中文文本识别的问题。这种网络很好地结合了卷积网络和循环网络各自的优势。
