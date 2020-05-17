@@ -127,7 +127,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 学位论文的正文应以《绪论》作为第一章
 \chapter{绪论}\label{chapter:intro}
-\section{研究背景}
+
 拥塞控制（Congestion Control）是传输层协议TCP（Transmission Control Protocol）的核心组成部分。
 在TCP的整体控制系统中，拥塞控制担负着解决网络拥塞和避免丢包以提升网络性能的重要责任\cite{jacobson1988congestion}。
 公平性是拥塞控制算法的主要性质之一，其要求拥塞控制算法能够在互相竞争的网络流中公平地分配带宽。
@@ -141,8 +141,6 @@
 而且，加增乘减机制已经被证明可以保证每条参与竞争的TCP流都一定会收敛到公平的均衡点~\cite{chiu1989analysis}。
 本文也将主要关注MulTCP和EWTCP这两种经典的基于加增乘减机制的带权拥塞控制算法。
 
-\section{研究动机}
-
 如今网络服务已经由free-use模型发展到pay-for-use模型，传统的公平性应当增强为加权公平性，以实现基于不同价格的差异化服务。
 首先，为了支持日渐增多的异质化应用对网络带宽的不同要求，网络管理者往往需要在网络中为不同的流量配置优先级或权重\cite{Hong2013SWAN}。
 拥有较高权重的流在竞争有限的带宽资源时，应该获得比权重较低的流更多的带宽。
@@ -153,8 +151,6 @@
 比如，如果能用带权拥塞控制来实现\cite{popa2012faircloud}中的带宽分配系统，那么将极大地提升系统的可拓展性，并降低交换机队列资源的消耗。
 \cite{Nathan2019wcubic}中也正是使用带权拥塞控制来实现了更高粒度的用户体验质量（Quality of Experience）层级的公平性。
 因此，我希望能够利用仿真和拟真实验来分析出带权拥塞控制的一些特性和规律，以便为带宽分配系统的设计提供指导。
-
-\section{相关工作}
 
 现有的支持网络带宽差异化分配的工作主要是利用交换机上的队列资源来对流量进行调度从而实现按权或按优先级分配带宽，比如Weighted Fair Queuing（WFQ）\cite{demers1989analysis}\cite{Abhay1993WFQ}和Diffserv\cite{Kathleen1998Diffserv}。
 前几年提出的NUMFabric\cite{nagaraj2016numfabric}和Faircloud\cite{popa2012faircloud}均依赖于交换机上的WFQ来实现加权公平性。
@@ -170,7 +166,6 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 总的来说，MulTCP和EWTCP都只是提出了一种基于AIMD的加权拥塞控制算法，而这些算法都没有能够完美地实现加权公平性。
 这主要是因为之前的这两份工作\cite{crowcroft1998differentiated}\cite{wischik2011design}都忽视了交换机缓冲区大小、传播时延和ACK选项对流的权重的影响。
 
-\section{本文主要工作}
 本文旨在对几种代表性的加权拥塞控制算法进行仿真和分析，以期总结出基于AIMD的加权拥塞控制算法的一些特性和规律，并最终提升人们对于加权拥塞控制算法的理解，帮助网络工程师们了解如何在实践中应用加权拥塞控制。本文的主要工作如下：
 \begin{enumerate}
 \item 对MulTCP和EWTCP进行仿真和拟真实验
@@ -557,7 +552,7 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
     \caption{EWTCP拟真实验流总带宽动统计图}
   \end{subfigure}
   \label{fig:PreWorkTrace}
-  \caption{两条权重分别为1和2的流使用分别使用MulTCP和EWTCP的拟真实验结果。}
+  \caption{两条权重分别为1和2的流使用分别使用MulTCP和EWTCP的拟真实验结果。带宽动态图中的target line是带权拥塞控制算法追求的目标线。}
 \end{figure}
 
 \textbf{带权拥塞控制算法在拟真实验环境中也可以实现加权公平性：}以WCC-AI为例，从图\ref{fig:TestbedExp}中的拟真实验结果可以看出，在拟真实验环境中WCC-AI也可以达到近乎完美的加权公平性并在长期中保持着良好的稳定性。
@@ -566,6 +561,56 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 从图\ref{fig:RED-AI-TestbedTrace}中可以发现，虽然使用RED队列引入了更多的波动，但是WCC-AI在大多数时候也还是能够近似地维持着两条流的加权公平性。
 同样地，MulTCP和EWTCP在相同的拟真实验环境中也可以实现差异化带宽分配，但是其加权公平性并不完美。
 如图\ref{fig:PreWorkTrace}所示，在流带宽动态图中可以发现，MulTCP和EWTCP各自两条流的带宽离它们应该达到的目标值都有一定的距离。
+
+\begin{table}[htp]
+	\caption{两条权重分别为1和2的WCC-AI流带宽比随交换机缓冲区大小变化的数据。}
+	\label{tab:TrendWithBuffer}
+	\centering
+	\begin{tabular}{c|cc|c}
+		\hline
+		缓冲区大小 & \multicolumn{2}{c|}{平均带宽 (Gbps)} & \multirow{2}*{Ratio}  \\
+		\cline{2-3}
+		(Bytes) & \multicolumn{1}{c}{Flow 1} & \multicolumn{1}{c|}{Flow 2} \\
+		\hline
+		12000 K & 3.12 & 6.31 & 1 : 2.022 \\
+		5000 K & 3.11 & 6.31 & 1 : 2.029 \\
+		2000 K & 3.15 & 6.27 & 1 : 1.990 \\
+		1000 K & 3.22 & 6.20 & 1 : 1.925 \\
+		500 K & 3.49 & 5.93 & 1 : 1.699 \\
+		250 K & 3.69 & 5.61 & 1 : 1.520 \\
+		100 K & 3.22 & 5.12 & 1 : 1.590 \\
+		500 & 1.37 & 2.04 & 1 : 1.489 \\
+		% 200 & 1.42 & 2.01 & 1 : 1.415 \\
+		% 100 & 1.44 & 1.99 & 1 : 1.382 \\
+		% 10 & 1.36 & 2.02 & 1 : 1.485 \\
+		% 4 & 1.42 & 2.00 & 1 : 1.408 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[htp]
+	\caption{两条权重分别为1和2的WCC-AI流带宽比随链路传播时延变化的数据。}
+	\label{tab:TrendWithDelay}
+	\centering
+	\begin{tabular}{c|cc|c}
+		\hline
+		拟真的  & \multicolumn{2}{c|}{平均带宽 (Gbps)} & \multirow{2}*{Ratio}  \\
+		\cline{2-3}
+		时延 & \multicolumn{1}{c}{Flow 1} & \multicolumn{1}{c|}{Flow 2} \\
+		\hline
+		5 ms & 1.20 & 2.37 & 1 : 1.975 \\
+		1 ms & 2.17 & 4.15 & 1 : 1.912 \\
+		500 $\mu$s & 2.69 & 5.15 & 1 : 1.914 \\
+		375 $\mu$s & 2.88 & 5.20 & 1 : 1.806 \\
+		250 $\mu$s & 2.86 & 5.61 & 1 : 1.962 \\
+		100 $\mu$s & 3.27 & 5.68 & 1 : 1.737 \\
+		50 $\mu$s & 3.42 & 5.80 & 1 : 1.696 \\
+		10 $\mu$s & 3.57 & 5.75 & 1 : 1.611 \\
+		1 $\mu$s & 3.61 & 5.77 & 1 : 1.598 \\
+		\hline
+	\end{tabular}
+\end{table}
+
 
 \begin{figure*}[ht]
   \begin{subfigure}{.5\textwidth}
@@ -592,14 +637,28 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
     \label{fig:EWTCP-RatioVar}
     \caption{两条EWTCP流带宽比值随交换机缓冲区大小变化图}
   \end{subfigure}
-	\caption{权重分别为1和2的两条MulTCP和EWTCP流的带宽及其比值随交换机缓冲区大小变化图。
-	}
+	\caption{权重分别为1和2的两条MulTCP和EWTCP流的带宽及其比值随交换机缓冲区大小变化图。}
 	\label{fig:PreWorkVar}
 \end{figure*}
 
+\textbf{基于加增乘减的带权拥塞控制算法的加权公平性是会随着网络环境变化而变化的：}
+我之前多次提到使用基于加增乘减的带权拥塞控制算法的TCP流会在不同的网络环境配置下获得不同份额的带宽，即若干条流之间的带宽比会随着网络环境的变化而变化。
+我最开始是在测试MulTCP和EWTCP时发现这一现象的。
+如图\ref{fig:PreWorkVar}所示，当实验中设置的交换机缓冲区大小由10$Kbytes$变化到500$Kbytes$时，两条MulTCP流和EWTCP流之间的带宽比都发生了显著的变化。
+对于MulTCP和EWTCP来说，只有当交换机缓冲区的大小比较小时，它们才能使两条权重分别为1和2的TCP流的带宽比达到它们的权重比，不过这也是以牺牲链路带宽利用率为代价的。
+而事实上这种现象不是MulTCP和EWTCP的特性，在进一步的实验中，我发现WCC-AI和WCC-MD也会展现出类似的变化。
+以WCC-AI为例，在拟真实验中我发现两条权重分别为1和2的WCC-AI流的带宽比会随着交换机缓冲区大小或链路传播时延的不同而发生显著变化。
+如表\ref{tab:TrendWithBuffer}所示，当实验中设置的交换机缓冲区大小由12$Mbytes$变化到500$Bytes$时，两条WCC-AI流的带宽比由$1:2.022$降到了$1:1.489$。
+由于连接服务器与交换机的光缆是固定长度的且由于光缆本身长度不大导致其传播时延极小（约等于16纳秒），所以我使用了Linux Traffic Control中的netem模块来模拟额外的传播时延。
+如表\ref{tab:TrendWithDelay}所示，当实验中设置的模拟链路时延由5$ms$变化到1$\mu s$时，两条WCC-AI流的带宽比由$1:1.975$降到了$1:1.598$。
+综上所述，我认为基于加增乘减的带权拥塞控制算法的加权公平性确实是会受到网络环境的影响。
+更准确地说，当交换机缓冲区大小越大、链路传播时延越高时，基于加增乘减的带权拥塞控制算法给权重不同的流分配的带宽差异越大，因此就会导致其加权公平性发生改变。
 
-\chapter{总结与讨论}
-在本文中，我们使用预处理层-卷积层-循环卷积层-转录层网络来处理手写中文文本识别的问题。这种网络很好地结合了卷积网络和循环网络各自的优势。
+\chapter{讨论与启发}\label{chapter:discusssion}
+
+\chapter{相关工作}\label{chapter:related works}
+
+\chapter{总结}\label{chapter:conclusion}
 
 \bibliography{reference}
 
