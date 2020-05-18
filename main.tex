@@ -679,6 +679,35 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 
 \chapter{相关工作}\label{chapter:related works}
 
+{\bf 控制策略：} 
+在同步反馈的假设下，Chiu和Jain分析了加增乘减（AIMD）、加增加减（AIAD）、乘增加减（MIAD）和乘增乘减（MIMD）等四种经典控制策略的高效性和公平性，并总结到只有AIMD能够在稳态时同时实现高效性和公平性\cite{chiu1989analysis}。
+此后，人们基于加增乘减的控制策略提出了大量的拥塞控制算法，并使得拥塞控制逐渐走向成熟，这其中就包含RAP~\cite{rejaie1999rap}， RLM~\cite{mccanne1996rlm}， LDA~\cite{sisalem1998lda}， Reno~\cite{jacobson1990modified}， Vegas~\cite{brakmo1995tcp}， NewReno~\cite{Henderson2012NewReno}等经典拥塞控制算法。
+当基于加增乘减的拥塞控制成熟以后，研究者们提出了通用加增乘减（General AIMD）\cite{yang2000general}和二项式拥塞控制（Binomial Congestion Control）\cite{bansal2001binomial}，希望以非线性的控制模型来泛化线性的控制策略。
+特别地，两种TCP友好的非线性控制策略——IIAD和SQRT被设计出来以用于实时流式应用\cite{bansal2001binomial}。
+General AIMD\cite{yang2000general}也阐述了类似的想法，但它主要关注AIMD的泛化。
+之后，还有人提出了使用SIMD——一种使用超线性增长策略和历史信息的拥塞控制——来提升收敛时间。
+
+{\bf 拥塞控制: }
+TCP一般利用丢包\cite{jacobson1990modified,Henderson2012NewReno,ha2008cubic}、往返时间变化\cite{brakmo1995tcp,cardwell2016bbr,arun2018copa,Zeng2019cc}等网络信号来对潜在的网络拥塞做出响应。
+DCTCP\cite{alizadeh2010data,alizadeh2011analysis}通过在乘减阶段结合ECN机制，为数据中心网络提供了一种传输速率更为平滑的拥塞控制算法。
+为了解决新型高性能网络中的拥塞问题，人们近年来提出了DCQCN\cite{zhu2015congestion}、Timely\cite{mittal2015timely}和HPCC\cite{li2019hpcc}三种新型的低时延拥塞控制算法。
+其中，DCQCN结合了QCN\cite{pan2007qcn}和DCTCP\cite{alizadeh2010data}的优点，Timely结合了传统的基于时延的拥塞控制算法思想和新型网卡的特性，HPCC则充分利用了新型可编程交换机的功能。
+最近，还有人提出了使用时下最热的机器学习算法来实现细粒度的拥塞控制，其中的典型代表是Remy\cite{winstein2013remy}和PCC Vivace\cite{dong2018pcc}。
+虽然这么多年来，人们不断地提出了上述种种日益新奇的拥塞控制算法，但是这些工作都是在追求公平性以及高带宽和低时延。
+它们都没有关注过应该如何实现拥塞控制算法的加权公平性。
+
+{\bf 加权公平性: }
+公平性是一个历史悠久的概念，在其之下还有许多不同的具体子概念。
+Max-min Fairness\cite{bertsekas1992data,jaffe1981bottleneck}和Proportional Fairness~\cite{kelly1997charging}就是最著名的两种具体定义的公平性，它们还可以拓展到一个更普适的公平性定义——$\alpha$-fairness\cite{mo2000fair}。
+%These works all present fundamental theories about how to share network bandwidth resources.
+%Nevertheless, though they provide some guides for designing bandwidth sharing policy of weighted congestion control, they don't give any analysis and solution about how to implement them.
+随着网络由free-use模型演化到pay-for-use模型，公平性原则便逐渐被拓展到了加权公平性，即在“公平地”分配资源时要参照各个竞争者的权重。
+MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{Honda2009EWTCP}均试图通过修改AIMD的具体行为来实现流级的加权公平性。
+Faircloud{popa2012faircloud}尝试基于Weighted Fair Queuing\cite{demers1989analysis,Abhay1993WFQ}来实现网络级的加权公平性
+NUMFabric和DGD则设计了复杂的、需要特定交换机支持的分布式优化算法，以实现包括加权公平性在内的一般化的网络带宽分配。
+一份最近的工作\cite{Nathan2019wcubic}基于CUBIC\cite{ha2008cubic}和FAST\cite{chen2004fast}实现了带权拥塞控制，并希望利用它来实现用户体验质量的公平性。
+此外，Multipath TCP\cite{wischik2011design,lu2018multi}也提到了需要使用带权拥塞控制来控制细粒度的带宽分配。
+
 \chapter{总结}\label{chapter:conclusion}
 
 \bibliography{reference}
