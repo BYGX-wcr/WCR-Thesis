@@ -505,8 +505,7 @@
 \renewcommand{\sectionmark}[1]{\markright{%
  \bfseries\if@mainmatter\thesection\hspace{1em}\fi{#1}%
 }}
-\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
-  \hbox{}\thispagestyle{empty}\if@twocolumn\hbox{}\fi\fi\fi}
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\if@twocolumn\hbox{}\fi\fi\fi}
 \setlist{%
   topsep=0.3em,             % 列表顶端的垂直空白
   partopsep=0pt,            % 列表环境前面紧接着一个空白行时其顶端的额外垂直空白
