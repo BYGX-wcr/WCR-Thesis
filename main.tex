@@ -133,11 +133,14 @@
 
 拥塞控制（Congestion Control）是传输层协议TCP（Transmission Control Protocol）的核心组成部分。
 在TCP的整体控制系统中，拥塞控制担负着解决网络拥塞和避免丢包以提升网络性能的重要责任\cite{jacobson1988congestion}。
-公平性是拥塞控制算法的主要性质之一，其要求拥塞控制算法能够在互相竞争的网络流中公平地分配带宽。
-由于公平性不仅是个技术问题还是个社会问题，公平性从传输层控制协议（TCP）加入拥塞控制算法伊始，就一直为人们所关注。
+也正是由于拥塞控制对于网络流的行为和表现有着重大的影响，所以拥塞控制一直是网络研究中的重点话题。
+公平性是拥塞控制算法的主要性质之一，其要求拥塞控制算法能够在互相竞争的网络流中公平地分配带宽，即每一条TCP流都能均等地分到拥塞链路的资源。
+公平性不仅是个技术问题还是个社会问题，它关乎到每一个网络用户（对于互联网来说，就是地球上的每一个普通人）的利益。
+因此，公平性从传输层控制协议（TCP）加入拥塞控制算法伊始，就一直为人们所关注。
 在拥塞控制算法和理论发展的早期，人们主要关注如何才能使TCP拥塞控制算法达到公平性以及某种拥塞控制算法是否满足公平性的要求等问题\cite{chiu1989analysis}\cite{kelly1998rate}\cite{hasegawa1999fairness}。
-但是随着网络的发展，在某些新的应用场景\cite{wischik2011design}\cite{Nathan2019wcubic}下，人们其实并不是希望公平地分配带宽而是希望能按权重来分配带宽。
+但是随着网络的发展，在某些新的应用场景\cite{wischik2011design}\cite{popa2012faircloud}\cite{Nathan2019wcubic}下，人们其实并不是希望公平地分配带宽而是希望能按权重来分配带宽。
 因此，研究者们又进一步关注到了公平性的广义拓展——加权公平性。
+加权公平性要求拥塞控制算法能够在互相竞争的网络流中按照它们的权重来分配带宽，即每一条TCP流都能分到对应于它权重的拥塞链路的资源。
 具有加权公平性的拥塞控制算法就是带权拥塞控制或加权拥塞控制（Weighted Congestion Control）算法，这种算法根据每条网络流的权重来分配带宽。
 由于基于加增乘减机制的拥塞控制算法的公平性最易于掌控和理解，最经典的两种带权拥塞控制算法MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{wischik2011design}也都是基于加增乘减机制的。
 加增乘减（Additive Increase Multiplicative Decrease）机制是TCP协议拥塞控制的主要方法，它结合了线性探索和乘性退避的功能。
@@ -151,11 +154,11 @@
 如果一个租户支付了更高的服务费用，那么它理应获得更多的带宽。
 带权拥塞控制正是一种可以用端到端的方式高效地实现差异化服务的机制。
 而且带权拥塞控制还可以从最细粒度的层级上去控制带宽，并具有工作保留（Work-Conserving）的特性。
-比如，如果能用带权拥塞控制来实现\cite{popa2012faircloud}中的带宽分配系统，那么将极大地提升系统的可拓展性，并降低交换机队列资源的消耗。
+比如，如果能用带权拥塞控制来实现Faircloud\cite{popa2012faircloud}中的PS-N、PS-L和PS-P带宽分配系统，那么将极大地提升系统的可拓展性，并降低交换机队列资源的消耗。
 Minerva\cite{Nathan2019wcubic}中也正是使用带权拥塞控制来动态地控制每一条流的带宽，并辅以优化最终实现了更高粒度的用户体验质量（Quality of Experience）层级的公平性。
 MPTCP\cite{wischik2011design}中也使用带权拥塞控制来控制每条路径上的每条子流的速率，以最终达到统一的聚合流的公平性。
 
-现有的支持网络带宽差异化分配的工作主要是利用交换机上的队列资源来对流量进行调度从而实现按权或按优先级分配带宽，比如Weighted Fair Queuing（WFQ）\cite{demers1989analysis}\cite{Abhay1993WFQ}和Diffserv\cite{Kathleen1998Diffserv}。
+现有的支持网络带宽差异化分配的工作主要是利用交换机上的队列资源来对流量进行调度从而实现按权或按优先级分配带宽，比如Weighted Fair Queuing （WFQ）\cite{demers1989analysis}\cite{Abhay1993WFQ}和Diffserv\cite{Kathleen1998Diffserv}。
 前几年提出的NUMFabric\cite{nagaraj2016numfabric}和Faircloud\cite{popa2012faircloud}均依赖于交换机上的WFQ来实现加权公平性。
 功能日渐强大的交换机确实可以帮助实现加权公平性，但对交换机的依赖也使得这些系统的部署受到了限制。
 由于网络节点总是要对网络的反馈作出回应，因此以加权拥塞控制为代表的端到端速率调整机制其实对于实现加权公平性更为普适。
@@ -230,11 +233,11 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 
 MulTCP\cite{crowcroft1998differentiated}同时修改加增乘减机制的加增（AI）部分和乘减（MD）部分以实现加权公平性。对于权重为$w$的流，其加增参数为$w$，乘减参数为$1-\frac{1}{2w}$。一个权重为$w$的MulTCP流发送端的行为可以概括为：
 
-\textbf{\large MulTCP}
 \begin{itemize}
-  \item {\bf 加增（Additive Increase）：} $cwnd \leftarrow cwnd + \frac{w}{cwnd}$ \\
+  \item[*] \textbf{\large MulTCP}
+  \item[-] {\bf 加增（Additive Increase）：} $cwnd \leftarrow cwnd + \frac{w}{cwnd}$ \\
   每收到一个ACK，拥塞窗口$cwnd$就增大$\frac{w}{cwnd}$。
-  \item {\bf 乘减（Multiplicative Decrease）:}
+  \item[-] {\bf 乘减（Multiplicative Decrease）:}
   $ \left\{
   \begin{aligned}
   cwnd & \leftarrow \frac{cwnd}{2} & cwnd < ssthresh \\
@@ -251,7 +254,8 @@ MulTCP\cite{crowcroft1998differentiated}同时修改加增乘减机制的加增�
 MulTCP的理论分析是基于传统的锯齿模型的，而锯齿模型已经被证实是极其不精确的\cite{alizadeh2011analysis}，所以其理论分析与现实是有偏差的。
 此外，启发MulTCP设计的直觉——用一条流来模拟多条流的聚合其实很难在现实中实现。
 其主要原因在于当多个丢包发生时，由于理应窗口减半的流的数目无法知悉，发送端很难准确地去测量多条TCP流应当减少的总拥塞窗口值。
-比如，在一次拥塞中$k$条流丢了$p$个包时，我们无法在没有全局信息的情况下确定这$p$个包是分别属于这$k$条流，还是只属于1条流，所以最终我们无法计算出拥塞窗口应该减少的量到底是$1 - \frac{cwnd}{2k}$还是$1 - \frac{cwnd}{2}$。
+比如，在一次拥塞中$k$条流丢了$p$个包时，我们无法在没有全局信息的情况下确定这$p$个包是分别属于这$k$条流，还是只属于1条流。
+因此，即使每条流的窗口大小相同均为$cwnd$，最终我们还是无法计算出总的拥塞窗口应该减少的量到底是$\frac{k \cdot cwnd}{2}$还是$\frac{cwnd}{2}$。
 我将在第三章中指出MulTCP事实上是无法准确地实现加权公平性的。
 
 \section{EWTCP}
@@ -259,11 +263,11 @@ MulTCP的理论分析是基于传统的锯齿模型的，而锯齿模型已经�
 EWTCP仅通过修改加增（AI）部分来实现加权公平性。对于一条权重为$w$的TCP流，EWTCP将AI的参数设定为$w^2$。
 一个权重为$w$的MulTCP流发送端的行为可以概括为：
 
-\textbf{\large EWTCP}
 \begin{itemize}
-  \item {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w^2}{cwnd}$ \\
+  \item[*] \textbf{\large EWTCP}
+  \item[-] {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w^2}{cwnd}$ \\
   每收到一个ACK，拥塞窗口$cwnd$就增长$\frac{w^2}{cwnd}$。
-  \item {\bf Multiplicative Decrease:} $cwnd \leftarrow \frac{cwnd}{2}$ \\
+  \item[-] {\bf Multiplicative Decrease:} $cwnd \leftarrow \frac{cwnd}{2}$ \\
   每探测到一次丢包，拥塞窗口就减半。
 \end{itemize}
 
@@ -280,29 +284,31 @@ EWTCP的模型在进行建模时还假设TCP流用的是累积ACK，然而现在
 
 仔细观察MulTCP和EWTCP的AIMD算法，其实可以发现它们都只是为加增乘减（AIMD的AI部分或MD部分配置了一个与流权重相关的因子。\cite{bansal2001binomial}中将包括AIMD在内的所有二项式拥塞控制算法做了一个形式化的描述。而对于基于AIMD的拥塞控制算法，我们也在此给出一个形式化的描述。对于一条权重为$w$的TCP流，基于AIMD的带权拥塞控制算法总是呈现出如下的形式：
 
-\textbf{\large General Form of Weighted AIMD Congestion Control}
 \begin{itemize}
-  \item {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w^\alpha}{cwnd}, \alpha \in \mathbb{R}$ \\
+  \item[*] \textbf{\large General Form of Weighted AIMD Congestion Control}
+  \item[-] {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w^\alpha}{cwnd}, \alpha \in \mathbb{R}$ \\
   每收到一个ACK，拥塞窗口$cwnd$就增长$\frac{w^\alpha}{cwnd}$。
-  \item {\bf Multiplicative Decrease:} $cwnd \leftarrow cwnd (1 - \frac{w^{-\beta}}{2}), \beta \in \mathbb{R}$ \\
+  \item[-] {\bf Multiplicative Decrease:} $cwnd \leftarrow cwnd (1 - \frac{w^{-\beta}}{2}), \beta \in \mathbb{R}$ \\
   每探测到一次丢包，拥塞窗口就减少$\frac{w^{-\beta}}{2}$。
 \end{itemize}
 也就是不同的基于AIMD的带权拥塞控制算法其实只是选择了不同的$\alpha$和$\beta$参数。
 基于Chiu论文\cite{chiu1989analysis}中的抽象模型来分析，其实直觉上最简单有效的带权拥塞控制算法应当为$\alpha=1,\beta=0$的WCC-AI和$\alpha=0,\beta=1$的WCC-MD。
 
-\textbf{\large WCC-AI}
+
 \begin{itemize}
-  \item {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w}{cwnd}$ \\
+  \item[*] \textbf{\large WCC-AI}
+  \item[-] {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{w}{cwnd}$ \\
   每收到一个ACK，拥塞窗口$cwnd$就增长$\frac{w}{cwnd}$。
-  \item {\bf Multiplicative Decrease:} $cwnd \leftarrow \frac{cwnd}{2}$ \\
+  \item[-] {\bf Multiplicative Decrease:} $cwnd \leftarrow \frac{cwnd}{2}$ \\
   每探测到一次丢包，拥塞窗口就减半。
 \end{itemize}
 
-\textbf{\large WCC-MD}
+
 \begin{itemize}
-  \item {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{1}{cwnd}$ \\
+  \item[*] \textbf{\large WCC-MD}
+  \item[-] {\bf Additive Increase:} $cwnd \leftarrow cwnd + \frac{1}{cwnd}$ \\
   每收到一个ACK，拥塞窗口$cwnd$就增长$\frac{1}{cwnd}$。
-  \item {\bf Multiplicative Decrease:} $cwnd \leftarrow ( 1 - \frac{1}{2w}) \cdot cwnd$ \\
+  \item[-] {\bf Multiplicative Decrease:} $cwnd \leftarrow ( 1 - \frac{1}{2w}) \cdot cwnd$ \\
   每探测到一次丢包，拥塞窗口就减少$\left( 1 - \frac{1}{2w} \right)$。
 \end{itemize}
 
@@ -376,7 +382,7 @@ EWTCP的模型在进行建模时还假设TCP流用的是累积ACK，然而现在
 在NS3仿真器中，我将MulTCP，EWTCP，WCC-AI和WCC-MD实现为ns3::TcpNewReno的子类，并在仿真实验中根据需求做出相应的调用。默认情况下，链路的带宽设置为10$Gbps$，链路的传播时延设置为20$\mu s$，交换机缓冲区的大小设置为200$KBytes$，选择ACK选项也默认开启。
 
 \textbf{带权拥塞控制算法确实可以实现差异化带宽分配，但是它们的加权公平性并不完美：}
-如图\ref{fig:Performance}所示，即使在动态的流模式中，四种带权拥塞控制算法也都成功地实现了使权重不同的流获得不同份额的带宽，而且四种算法由一个收敛状态转换到另一个收敛状态的速度都很快。
+如图\ref{fig:MulTCPPerformance}、\ref{fig:EWTCPPerformance}、\ref{fig:WReno-AIPerformance}和\ref{fig:WReno-MDPerformance}所示，即使在动态的流模式中，四种带权拥塞控制算法也都成功地实现了使权重不同的流获得不同份额的带宽，而且四种算法由一个收敛状态转换到另一个收敛状态的速度都很快。
 但是，仔细检查图中各条流的带宽可以发现使用MulTCP和EWTCP的实验中，四条流的带宽比并不是等于它们的权重比的。
 反倒是最基础的WCC-AI和WCC-MD的四条流的带宽比基本接近它们的权重比。
 这似乎表明MulTCP和EWTCP不能达到精确的加权公平性，而WCC-AI和WCC-MD可以达到较为精确的加权公平性。
@@ -384,7 +390,7 @@ EWTCP的模型在进行建模时还假设TCP流用的是累积ACK，然而现在
 这也意味着，这四种典型的基于加增乘减的带权拥塞控制算法都可以实现流级的差异化带宽分配，但是它们的加权公平性（或者说它们的带宽分配结果）是不完美的。
 更为准确地说，它们的加权公平性是会随着网络环境的变化而变化的。
 我将会在节\ref{sec:emulation}中更为详细地说明这一点，并给出基于AIMD的带权拥塞控制算法的加权公平性随环境变量变化的规律。
-此外，从仿真结果中可以看出WCC-MD的表现与WCC-AI大致相同，所以在接下来的内容中我将不再呈现WCC-MD的实验结果，不过我们之后的讨论与分析还会涉及到它。
+此外，从仿真结果中可以看出WCC-MD的表现与WCC-AI大致相同，所以在接下来的内容中我将重点呈现WCC-AI的实验结果，对于WCC-MD的实验结果我会在必要时再加以说明，不过我们之后的讨论与分析会一直涵盖WCC-MD。
 
 \begin{figure}[ht]
 	\begin{subfigure}{.5\textwidth}
@@ -492,92 +498,14 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 当流的拥塞控制算法基本遵循AIMD的规则时，流受到的影响比较小，如NewReno和WCC-AI的流；当流的拥塞控制算法与AIMD的规则差别较大时，其窗口变动会较为剧烈，流受到的影响就会比较大，如MulTCP和EWTCP的流。
 在下一节的仿真实验中，我也会进一步地来验证这一点。
 
-\begin{figure*}[ht!]
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.2in]{AI-Testbed-Trace.pdf}
-    \caption{WCC-AI拟真实验流带宽动态图（使用DropTail队列和选择ACK）}
-    \label{fig:AI-TestbedTrace}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.2in]{AI-Testbed-Summary.pdf}
-    \caption{WCC-AI拟真实验流总带宽动统计图（使用DropTail队列和选择ACK）}
-    \label{fig:AI-TestbedSum}
-  \end{subfigure}
-  \begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.2in]{RED-AI-Testbed-Trace.pdf}
-    \caption{WCC-AI拟真实验流带宽动态图（使用RED队列和选择ACK）}
-    \label{fig:RED-AI-TestbedTrace}
-  \end{subfigure}
-  \begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.2in]{RED-AI-Testbed-Summary.pdf}
-    \caption{WCC-AI拟真实验流总带宽动统计图（使用RED队列和选择ACK）}
-    \label{fig:RED-AI-TestbedSum}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=2.2in]{CACK-AI-Testbed-Trace.pdf}
-    \caption{WCC-AI拟真实验流带宽动态图（使用DropTail队列和累积ACK）}
-		\label{fig:CACK-AI-TestbedTrace}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=2.2in]{CACK-AI-Testbed-Summary.pdf}
-    \caption{WCC-AI拟真实验流总带宽动统计图（使用DropTail队列和累积ACK）}
-		\label{fig:CACK-AI-TestbedSum}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=2.2in]{RED-CACK-AI-Testbed-Trace.pdf}
-    \caption{WCC-AI拟真实验流带宽动态图（使用RED队列和累积ACK）}
-		\label{fig:RED-CACK-AI-TestbedTrace}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=2.2in]{RED-CACK-AI-Testbed-Summary.pdf}
-    \caption{WCC-AI拟真实验流总带宽动统计图（使用RED队列和累积ACK）}
-		\label{fig:RED-CACK-AI-TestbedSum}
-  \end{subfigure}
-  \caption{两条权重分别为1和2的WCC-AI流的拟真实验结果。尾部丢包（DropTail）队列的上限为2$MBytes$，早期随机丢包（RED）队列的下阈值为1$Mbytes$，上阈值为5$Mbytes$.}
-  \label{fig:TestbedExp}
-\end{figure*}
-
 \section{拟真实验}
 \label{sec:emulation}
 
-仿真实验缺乏随机性，所以在这一节中我采用了拟真实验来更好地验证带权拥塞控制的加权公平性随环境变量变化的规律。我使用了三台搭载Intel Xeon处理器、运行Linux系统的DELL服务器和一台Mellanox交换机来搭建了拟真实验环境。我将MulTCP，EWTCP和WCC-AI都基于原有的内核代码实现为新的内核拥塞控制模块并载入三台服务器的内核中。我使用Iperf\cite{iperf}来产生TCP流量和调用所需的拥塞控制算法，使两条使用带权拥塞控制的TCP流通过一条10$Gbps$的拥塞链路到达接收主机上。
-
-\begin{figure}[h]
-  \begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Trace.pdf}
-    \caption{MulTCP拟真实验流带宽动态图}
-    \label{fig:MulTCP-2M-TestbedTrace}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Summary.pdf}
-    \caption{MulTCP拟真实验流总带宽动统计图}
-    \label{fig:MulTCP-2M-TestbedSum}
-  \end{subfigure}
-  \begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Trace.pdf}
-    \caption{EWTCP拟真实验流带宽动态图}
-    \label{fig:EWTCP-2M-TestbedTrace}
-  \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-    \centering
-		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Summary.pdf}
-    \caption{EWTCP拟真实验流总带宽动统计图}
-    \label{fig:EWTCP-2M-TestbedSum}
-  \end{subfigure}
-  \caption{两条权重分别为1和2的流使用分别使用MulTCP和EWTCP的拟真实验结果。带宽动态图中的target line是带权拥塞控制算法追求的目标线。}
-  \label{fig:PreWorkTrace}
-\end{figure}
+仿真实验缺乏随机性，所以在这一节中我采用了拟真实验来更好地验证带权拥塞控制的加权公平性随环境变量变化的规律。
+我使用了三台搭载Intel Xeon处理器、运行Linux 16.04 LTS系统的DELL服务器和一台Mellanox SN2700交换机来搭建了拟真实验环境。
+我将MulTCP、EWTCP、WCC-AI和WCC-MD都基于原有的内核代码实现为新的内核拥塞控制模块并载入三台服务器的内核中。
+我使用Iperf\cite{iperf}来产生TCP流量和调用所需的拥塞控制算法，使两条使用带权拥塞控制的TCP流通过一条10$Gbps$的拥塞链路到达接收主机上。
+我使用Linux系统内核里的TCP参数{\tt net.ipv4.tcp\_sack}来控制ACK选项，以实现选择ACK和累积ACK的切换。
 
 \textbf{内核实现：}
 我基于现有Linux内核中的Reno拥塞控制模块的代码来实现了MulTCP、EWTCP、WCC-AI和WCC-MD。
@@ -633,6 +561,88 @@ static u32 tcp_wreno_md_ssthresh(struct sock *sk)
 \end{lstlisting}
 观察上述代码可发现，只需自己用整数运算操作实现一个除法函数，然后在\texttt{tp->snd\_cwnd}减半后使其除以权重参数\texttt{ca->weight}即可实现对MD部分的修改。
 
+\begin{figure*}[ht!]
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.2in]{AI-Testbed-Trace.pdf}
+    \caption{WCC-AI拟真实验流带宽动态图（使用DropTail队列和选择ACK）}
+    \label{fig:AI-TestbedTrace}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.2in]{AI-Testbed-Summary.pdf}
+    \caption{WCC-AI拟真实验流总带宽动统计图（使用DropTail队列和选择ACK）}
+    \label{fig:AI-TestbedSum}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.2in]{RED-AI-Testbed-Trace.pdf}
+    \caption{WCC-AI拟真实验流带宽动态图（使用RED队列和选择ACK）}
+    \label{fig:RED-AI-TestbedTrace}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.2in]{RED-AI-Testbed-Summary.pdf}
+    \caption{WCC-AI拟真实验流总带宽动统计图（使用RED队列和选择ACK）}
+    \label{fig:RED-AI-TestbedSum}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=2.2in]{CACK-AI-Testbed-Trace.pdf}
+    \caption{WCC-AI拟真实验流带宽动态图（使用DropTail队列和累积ACK）}
+		\label{fig:CACK-AI-TestbedTrace}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=2.2in]{CACK-AI-Testbed-Summary.pdf}
+    \caption{WCC-AI拟真实验流总带宽动统计图（使用DropTail队列和累积ACK）}
+		\label{fig:CACK-AI-TestbedSum}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=2.2in]{RED-CACK-AI-Testbed-Trace.pdf}
+    \caption{WCC-AI拟真实验流带宽动态图（使用RED队列和累积ACK）}
+		\label{fig:RED-CACK-AI-TestbedTrace}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=2.2in]{RED-CACK-AI-Testbed-Summary.pdf}
+    \caption{WCC-AI拟真实验流总带宽动统计图（使用RED队列和累积ACK）}
+		\label{fig:RED-CACK-AI-TestbedSum}
+  \end{subfigure}
+  \caption{两条权重分别为1和2的WCC-AI流的拟真实验结果。尾部丢包（DropTail）队列的上限为2$MBytes$，早期随机丢包（RED）队列的下阈值为1$Mbytes$，上阈值为5$Mbytes$.}
+  \label{fig:TestbedExp}
+\end{figure*}
+
+\begin{figure}[h]
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Trace.pdf}
+    \caption{MulTCP拟真实验流带宽动态图}
+    \label{fig:MulTCP-2M-TestbedTrace}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Summary.pdf}
+    \caption{MulTCP拟真实验流总带宽动统计图}
+    \label{fig:MulTCP-2M-TestbedSum}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Trace.pdf}
+    \caption{EWTCP拟真实验流带宽动态图}
+    \label{fig:EWTCP-2M-TestbedTrace}
+  \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+    \centering
+		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Summary.pdf}
+    \caption{EWTCP拟真实验流总带宽动统计图}
+    \label{fig:EWTCP-2M-TestbedSum}
+  \end{subfigure}
+  \caption{两条权重分别为1和2的流使用分别使用MulTCP和EWTCP的拟真实验结果。带宽动态图中的target line是带权拥塞控制算法追求的目标线。}
+  \label{fig:PreWorkTrace}
+\end{figure}
+
 \textbf{带权拥塞控制算法在拟真实验环境中也可以实现加权公平性：}以WCC-AI为例，从图\ref{fig:TestbedExp}中的拟真实验结果可以看出，在拟真实验环境中WCC-AI也可以达到近乎完美的加权公平性并在长期中保持着良好的稳定性。
 如图\ref{fig:AI-TestbedSum}所示，在整个100s的实验中两条流的长期平均带宽比极其接近其权重比$1:2$。
 我还测试了一下早期随机丢包（RED）队列对带权拥塞控制算法的影响。
@@ -640,9 +650,12 @@ static u32 tcp_wreno_md_ssthresh(struct sock *sk)
 同样地，MulTCP和EWTCP在相同的拟真实验环境中也可以实现差异化带宽分配，但是其加权公平性并不完美。
 如图\ref{fig:PreWorkTrace}所示，在流带宽动态图中可以发现，MulTCP和EWTCP各自的两条流的带宽离它们应该达到的目标值都有一定的距离。
 
-\textbf{累积ACK确实会对加权公平性产生显著影响：}
-我在拟真实验中，也测试了累积ACK对加权公平性的影响，结果如图\ref{fig:CACK-AI-TestbedTrace}和\ref{fig:RED-CACK-AI-TestbedTrace}所示。
+\textbf{验证累积ACK确实会对加权公平性产生显著影响：}
+我在拟真实验中也测试了累积ACK对加权公平性的影响，结果如图\ref{fig:CACK-AI-TestbedTrace}和\ref{fig:RED-CACK-AI-TestbedTrace}所示。
 与图\ref{fig:AI-TestbedTrace}和\ref{fig:RED-AI-TestbedTrace}对比可知，当使用累积ACK选项时，基于AIMD的带权拥塞控制算法的几条TCP流之间的带宽比会显著下降。
+原本使用选择ACK时，两条权重分别为1和2的WCC-AI流在仿真总时长内的平均带宽比在使用上限为2$MBytes$的尾部丢包队列时会达到$1:1.99$，在使用上阈值为5$MBytes$、下阈值为1$MBytes$的早期随机丢包队列时会达到$1:1.74$。
+当使用累积ACK时，两条权重分别为1和2的WCC-AI流在仿真总时长内的平均带宽比在使用上限为2$MBytes$的尾部丢包队列时就降到了$1:1.56$，在使用上阈值为5$MBytes$、下阈值为1$MBytes$的早期随机丢包队列时就降到了$1.50$。
+也就是说权重较大的WCC-AI流的带宽与权重较小的WCC-AI流的带宽相比下降了$\%14~\%25$。
 
 \begin{table}[htp]
 	\caption{两条权重分别为1和2的WCC-AI流带宽比随交换机缓冲区大小变化的数据。}
