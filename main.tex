@@ -19,6 +19,9 @@
 %% Linux系统请用
 %\documentclass[linuxfonts]{njuthesis}
 
+% 添加额外的包
+\usepackage{listings}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 设置论文的中文封面
 % 论文标题
@@ -309,41 +312,65 @@ EWTCP的模型在进行建模时还假设TCP流用的是累积ACK，然而现在
 
 \chapter{实验与分析}\label{chapter:analysis}
 
-\begin{figure*}[tp]
-	\centering
-  \begin{subfigure}{.6\textwidth}
-    \centering
-		\includegraphics[width=3.2in]{multcp-dynamic.pdf}
-    \caption{MulTCP流仿真带宽图}
-    \label{fig:MulTCPPerformance}
-  \end{subfigure}
-  \begin{subfigure}{.6\textwidth}
-    \centering
-		\includegraphics[width=3.2in]{ewtcp-dynamic.pdf}
-    \caption{EWTCP流仿真带宽图}
-    \label{fig:EWTCPPerformance}
-	\end{subfigure}
-  \begin{subfigure}{.6\textwidth}
-    \centering
-		\includegraphics[width=3.2in]{wrenoai-dynamic.pdf}
-    \caption{WCC-AI流仿真带宽图}
-    \label{fig:WReno-AIPerformance}
-  \end{subfigure}
-  \begin{subfigure}{.6\textwidth}
-    \centering
-		\includegraphics[width=3.2in]{wrenomd-dynamic.pdf}
-    \caption{WCC-MD流仿真带宽图}
-    \label{fig:WReno-MDPerformance}
-	\end{subfigure}
-	\caption{四种典型带权拥塞控制算法的仿真结果。紫、黄、红、蓝四种颜色的线分别对应于权重为4，3，2，1的TCP流。}
-	\label{fig:Performance}
-\end{figure*}
-
+% \begin{figure*}[tp]
+% 	\centering
+%   \begin{subfigure}{.6\textwidth}
+%     \centering
+% 		\includegraphics[width=3.2in]{multcp-dynamic.pdf}
+%     \caption{MulTCP流仿真带宽图}
+%     \label{fig:MulTCPPerformance}
+%   \end{subfigure}
+%   \begin{subfigure}{.6\textwidth}
+%     \centering
+% 		\includegraphics[width=3.2in]{ewtcp-dynamic.pdf}
+%     \caption{EWTCP流仿真带宽图}
+%     \label{fig:EWTCPPerformance}
+% 	\end{subfigure}
+%   \begin{subfigure}{.6\textwidth}
+%     \centering
+% 		\includegraphics[width=3.2in]{wrenoai-dynamic.pdf}
+%     \caption{WCC-AI流仿真带宽图}
+%     \label{fig:WReno-AIPerformance}
+%   \end{subfigure}
+%   \begin{subfigure}{.6\textwidth}
+%     \centering
+% 		\includegraphics[width=3.2in]{wrenomd-dynamic.pdf}
+%     \caption{WCC-MD流仿真带宽图}
+%     \label{fig:WReno-MDPerformance}
+% 	\end{subfigure}
+% 	\caption{四种典型带权拥塞控制算法的仿真结果。紫、黄、红、蓝四种颜色的线分别对应于权重为4，3，2，1的TCP流。}
+% 	\label{fig:Performance}
+% \end{figure*}
 
 在这章中，首先我将使用NS3仿真器\cite{NS3}对四种典型带权拥塞控制算法进行仿真，并根据仿真结果对它们进行分析。然后，我将会使用一些拟真实验来验证我分析出的一些想法。
 
 \section{仿真实验}
 \label{sec:simulation}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=6.0in]{multcp-dynamic.pdf}
+  \caption{MulTCP流仿真带宽图}
+  \label{fig:MulTCPPerformance}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=6.0in]{ewtcp-dynamic.pdf}
+  \caption{EWTCP流仿真带宽图}
+  \label{fig:EWTCPPerformance}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=6.0in]{wrenoai-dynamic.pdf}
+  \caption{WCC-AI流仿真带宽图}
+  \label{fig:WReno-AIPerformance}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=6.0in]{wrenomd-dynamic.pdf}
+  \caption{WCC-MD流仿真带宽图}
+  \label{fig:WReno-MDPerformance}
+\end{figure}
 
 \textbf{环境配置：}
 在NS3仿真器中，我将MulTCP，EWTCP，WCC-AI和WCC-MD实现为ns3::TcpNewReno的子类，并在仿真实验中根据需求做出相应的调用。默认情况下，链路的带宽设置为10$Gbps$，链路的传播时延设置为20$\mu s$，交换机缓冲区的大小设置为200$KBytes$，选择ACK选项也默认开启。
@@ -463,8 +490,9 @@ EWTCP的模型在进行建模时还假设TCP流用的是累积ACK，然而现在
 EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但是其加权公平性的准确度还是降低了的。
 我觉得这种意料之外的影响应该是因为累积ACK会导致过多的重传事件发生\cite{Mathis1996SACK}，这会使窗口剧烈波动，从而对拥塞控制算法的稳态产生影响。
 当流的拥塞控制算法基本遵循AIMD的规则时，流受到的影响比较小，如NewReno和WCC-AI的流；当流的拥塞控制算法与AIMD的规则差别较大时，其窗口变动会较为剧烈，流受到的影响就会比较大，如MulTCP和EWTCP的流。
+在下一节的仿真实验中，我也会进一步地来验证这一点。
 
-\begin{figure*}[h]
+\begin{figure*}[ht!]
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.2in]{AI-Testbed-Trace.pdf}
@@ -522,7 +550,7 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 
 仿真实验缺乏随机性，所以在这一节中我采用了拟真实验来更好地验证带权拥塞控制的加权公平性随环境变量变化的规律。我使用了三台搭载Intel Xeon处理器、运行Linux系统的DELL服务器和一台Mellanox交换机来搭建了拟真实验环境。我将MulTCP，EWTCP和WCC-AI都基于原有的内核代码实现为新的内核拥塞控制模块并载入三台服务器的内核中。我使用Iperf\cite{iperf}来产生TCP流量和调用所需的拥塞控制算法，使两条使用带权拥塞控制的TCP流通过一条10$Gbps$的拥塞链路到达接收主机上。
 
-\begin{figure}{h}
+\begin{figure}[h]
   \begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Trace.pdf}
@@ -551,6 +579,60 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
   \label{fig:PreWorkTrace}
 \end{figure}
 
+\textbf{内核实现：}
+我基于现有Linux内核中的Reno拥塞控制模块的代码来实现了MulTCP、EWTCP、WCC-AI和WCC-MD。
+这一实现是基于IETF的RFC文档\cite{allman2009CC}的标准实现，保证代码的基本正确性。
+其实基于已有的使用加增乘减机制的拥塞控制代码来实现带权拥塞控制非常简单，只需要修改相应的加增部分或者乘减部分即可。
+实现MulTCP即为同时把加增部分的参数乘上流的权重和乘减部分的参数除以流的权重。
+把加增部分的参数改为流的权重的平方，即可实现EWTCP。
+实现WCC-AI和WCC-MD则可以视为实现带权拥塞控制的基本样例，因为它们分别代表了修改加增部分和修改乘减部分的基本原则。
+实现WCC-AI时，只需把拥塞控制模块中的\texttt{tcp\_cong\_avoid\_ai}函数改为如下的函数即可：
+\lstset{language=C,basicstyle=\footnotesize,frame=shadowbox}
+\begin{lstlisting}
+static void tcp_wcc_cong_avoid_ai(struct sock *sk, u32 w, u32 acked)
+{
+	struct tcp_wcc *ca = inet_csk_ca(sk);
+	struct tcp_sock *tp = tcp_sk(sk);
+
+	if (tp->snd_cwnd_cnt >= w) {
+		tp->snd_cwnd_cnt = 0;
+		tp->snd_cwnd++;
+	}
+
+	ca->weight_acked_cnt += ca->weight * wcc_precision * acked;
+	if (ca->weight_acked_cnt >= wcc_precision) {
+		u32 delta = ca->weight_acked_cnt / wcc_precision;
+
+		ca->weight_acked_cnt -= delta * wcc_precision;
+		tp->snd_cwnd_cnt += delta;
+	}
+
+	if (tp->snd_cwnd_cnt >= w) {
+		u32 delta = tp->snd_cwnd_cnt / w;
+
+		tp->snd_cwnd_cnt -= delta * w;
+		tp->snd_cwnd += delta;
+	}
+	tp->snd_cwnd = min(tp->snd_cwnd, tp->snd_cwnd_clamp);
+}
+\end{lstlisting}
+观察上述代码可发现，只需在增加\texttt{ca->weight\_acked\_cnt}时加入权重参数\texttt{ca->weight}即可实现对AI部分的修改。
+实现WCC-MD时，只需把拥塞控制模块中的\texttt{tcp\_reno\_ssthresh}函数改为如下的函数即可：
+\lstset{language=C,basicstyle=\footnotesize,frame=shadowbox}
+\begin{lstlisting}
+static u32 tcp_wreno_md_ssthresh(struct sock *sk)
+{
+    const struct tcp_sock *tp = tcp_sk(sk);
+    struct tcp_wcc *ca = inet_csk_ca(sk);
+
+    u32 new_cwnd;
+    new_cwnd = tp->snd_cwnd - divide((tp->snd_cwnd >> 1U), ca->weight);
+
+    return max(new_cwnd, 2U);
+}
+\end{lstlisting}
+观察上述代码可发现，只需自己用整数运算操作实现一个除法函数，然后在\texttt{tp->snd\_cwnd}减半后使其除以权重参数\texttt{ca->weight}即可实现对MD部分的修改。
+
 \textbf{带权拥塞控制算法在拟真实验环境中也可以实现加权公平性：}以WCC-AI为例，从图\ref{fig:TestbedExp}中的拟真实验结果可以看出，在拟真实验环境中WCC-AI也可以达到近乎完美的加权公平性并在长期中保持着良好的稳定性。
 如图\ref{fig:AI-TestbedSum}所示，在整个100s的实验中两条流的长期平均带宽比极其接近其权重比$1:2$。
 我还测试了一下早期随机丢包（RED）队列对带权拥塞控制算法的影响。
@@ -560,6 +642,7 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 
 \textbf{累积ACK确实会对加权公平性产生显著影响：}
 我在拟真实验中，也测试了累积ACK对加权公平性的影响，结果如图\ref{fig:CACK-AI-TestbedTrace}和\ref{fig:RED-CACK-AI-TestbedTrace}所示。
+与图\ref{fig:AI-TestbedTrace}和\ref{fig:RED-AI-TestbedTrace}对比可知，当使用累积ACK选项时，基于AIMD的带权拥塞控制算法的几条TCP流之间的带宽比会显著下降。
 
 \begin{table}[htp]
 	\caption{两条权重分别为1和2的WCC-AI流带宽比随交换机缓冲区大小变化的数据。}
