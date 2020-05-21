@@ -220,34 +220,8 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
       \label{fig:WReno-MD}
   \end{subfigure}
   \caption{几种基于加增乘减机制的典型带权拥塞控制算法运行抽象模拟图。图中每一条轴代表了一条TCP流0-1标准化后的窗口大小。蓝色实线（高效线）代表链路带宽用满，蓝色虚线（加权公平线）代表两条流权重成比例。}
-  % Each axis corresponds to the window size of each source that is normalized to a number between 0 and 1 for convenience.
-  % If the point colored red lies in the blue solid line, this represents that one unit capacity is fully utilized, \ie, the sum of the obtained bandwidth for two flows is equal to one.
-  % 		If the point colored red lies in the blue dashed line, this indicates that the obtained bandwidth ratio for two flows is $a_1 : a_2$.
-  % 		The intersection of the blue solid line and dashed line is the optimal point to achieve efficiency and weighted proportionality.
 \label{fig:AIMD}
 \end{figure}
-% \begin{figure}[t]
-% 		\begin{subfigure}{.5\textwidth}[The AIMD variations that two MulTCP flows with weight $a_1$ and $a_2$ share a single bottleneck link of capacity one.]{
-% 			\label{fig:MulTCP}
-%       \includegraphics[width=0.9\textwidth]{figure/MulTCP.pdf}}
-%     \end{subfigure}
-% 		\subfigure[The AIMD variations that two EWTCP flows with weight $a_1$ and $a_2$ share a single bottleneck link of capacity one.]{
-% 			\label{fig:EWTCP}
-% 			\includegraphics[width=0.9\textwidth]{figure/EWTCP.pdf}}
-% 		\subfigure[The AIMD variations that two ~flows (modify AI phase) with weight $a_1$ and $a_2$ share a single bottleneck link of capacity one.]{
-% 			\label{fig:WRenoAI}
-% 			\includegraphics[width=0.9\textwidth]{figure/WReno-AI.pdf}}
-% 		\subfigure[The AIMD variations of two ~flows (modify MD phase) with weight $a_1$ and $a_2$ share a single bottleneck link of capacity one.]{
-% 			\label{fig:WRenoMD}
-% 			\includegraphics[width=0.9\textwidth]{figure/WReno-MD.pdf}}
-% 	\caption{The two-source AIMD variations comparison using the technique of Chiu and Jain~\cite{chiu1989analysis}.
-% Each axis corresponds to the window size of each source that is normalized to a number between 0 and 1 for convenience.
-% If the point colored red lies in the blue solid line, this represents that one unit capacity is fully utilized, \ie, the sum of the obtained bandwidth for two flows is equal to one.
-% 		If the point colored red lies in the blue dashed line, this indicates that the obtained bandwidth ratio for two flows is $a_1 : a_2$.
-% 		The intersection of the blue solid line and dashed line is the optimal point to achieve efficiency and weighted proportionality.
-% 	}
-% 	\label{fig:AIMD}
-% \end{figure}
 
 \section{MulTCP}
 
@@ -320,26 +294,26 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
   \begin{subfigure}{.6\textwidth}
     \centering
 		\includegraphics[width=3.2in]{multcp-dynamic.pdf}
-    \label{fig:MulTCPPerformance}
     \caption{MulTCP流仿真带宽图}
+    \label{fig:MulTCPPerformance}
   \end{subfigure}
   \begin{subfigure}{.6\textwidth}
     \centering
 		\includegraphics[width=3.2in]{ewtcp-dynamic.pdf}
-    \label{fig:EWTCPPerformance}
     \caption{EWTCP流仿真带宽图}
+    \label{fig:EWTCPPerformance}
 	\end{subfigure}
   \begin{subfigure}{.6\textwidth}
     \centering
 		\includegraphics[width=3.2in]{wrenoai-dynamic.pdf}
-    \label{fig:WReno-AIPerformance}
     \caption{WCC-AI流仿真带宽图}
+    \label{fig:WReno-AIPerformance}
   \end{subfigure}
   \begin{subfigure}{.6\textwidth}
     \centering
 		\includegraphics[width=3.2in]{wrenomd-dynamic.pdf}
-    \label{fig:WReno-MDPerformance}
     \caption{WCC-MD流仿真带宽图}
+    \label{fig:WReno-MDPerformance}
 	\end{subfigure}
 	\caption{四种典型带权拥塞控制算法的仿真结果。紫、黄、红、蓝四种颜色的线分别对应于权重为4，3，2，1的TCP流。}
 	\label{fig:Performance}
@@ -370,13 +344,13 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
     \centering
     \includegraphics[width=2.8in]{bounded.pdf}
     \caption{RWND最大为131$KBytes$}
-		\label{fig:BoundedCwnd}
+	\label{fig:BoundedCwnd}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
 		\centering
     \includegraphics[width=2.8in]{unbounded.pdf}
     \caption{RWND接近无穷大}
-		\label{fig:UnbounedCwnd}
+	\label{fig:UnbounedCwnd}
   \end{subfigure}
 	\caption{接收端窗口大小对加权公平性的影响.}
 	\label{fig:EndHostBuffer}
@@ -395,50 +369,50 @@ EWTCP又被叫做WAIMD\cite{Honda2009EWTCP}，它对AI部分的修改是源自�
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{reno-cack.pdf}
-    \label{fig:renoCack}
     \caption{使用累积ACK的NewReno流}
+    \label{fig:renoCack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.4in]{reno-sack.pdf}
-    \label{fig:renoSack}
     \caption{使用选择ACK的NewReno流}
+    \label{fig:renoSack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{multcp-cack.pdf}
-    \label{fig:multcpCack}
     \caption{使用累积ACK的MulTCP流}
+    \label{fig:multcpCack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{multcp-sack.pdf}
-    \label{fig:multcpSack}
     \caption{使用选择ACK的MulTCP流}
+    \label{fig:multcpSack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{ewtcp-cack.pdf}
-    \label{fig:ewtcpCack}
     \caption{使用累积ACK的EWTCP流}
+    \label{fig:ewtcpCack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{ewtcp-sack.pdf}
-    \label{fig:ewtcpSack}
     \caption{使用选择ACK的EWTCP流}
+    \label{fig:ewtcpSack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{wreno-cack.pdf}
-    \label{fig:wrenoCack}
     \caption{使用累积ACK的WCC-AI流}
+    \label{fig:wrenoCack}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{wreno-sack.pdf}
-    \label{fig:wrenoSack}
     \caption{使用选择ACK的WCC-AI流}
+    \label{fig:wrenoSack}
   \end{subfigure}
 	\caption{NewReno普通拥塞控制和MulTCP、EWTCP、WCC-AI三种带权拥塞控制算法与两种ACK选项的对比仿真。}
 	\label{fig:CackSackDiff}
@@ -480,27 +454,27 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{AI-Testbed-Trace.pdf}
-    \label{fig:AI-TestbedTrace}
     \caption{WCC-AI拟真实验流带宽动态图（使用DropTail队列）}
+    \label{fig:AI-TestbedTrace}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{AI-Testbed-Summary.pdf}
-    \label{fig:AI-TestbedSum}
     \caption{WCC-AI拟真实验流总带宽动统计图（使用DropTail队列）}
+    \label{fig:AI-TestbedSum}
   \end{subfigure}
   %Threshold: min-1MB max-5MB
   \begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{RED-AI-Testbed-Trace.pdf}
-    \label{fig:RED-AI-TestbedTrace}
     \caption{WCC-AI拟真实验流带宽动态图（使用RED队列）}
+    \label{fig:RED-AI-TestbedTrace}
   \end{subfigure}
-	\begin{subfigure}{.5\textwidth}
+  \begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{RED-AI-Testbed-Summary.pdf}
-    \label{fig:RED-AI-TestbedSum}
     \caption{WCC-AI拟真实验流总带宽动统计图（使用RED队列）}
+    \label{fig:RED-AI-TestbedSum}
   \end{subfigure}
 	% %Buffer size: 2MB
 	% \begin{subfigure}{.5\textwidth}
@@ -525,36 +499,36 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
 	% 	\label{fig:RED-CACK-AI-TestbedSum}
   % \end{subfigure}
   \caption{两条权重分别为1和2的WCC-AI流的拟真实验结果。尾部丢包（DropTail）队列的上限为2$MBytes$，早期随机丢包（RED）队列的下阈值为1$Mbytes$，上阈值为5$Mbytes$.}
-	\label{fig:TestbedExp}
+  \label{fig:TestbedExp}
 \end{figure*}
 
 \begin{figure}
   \begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Trace.pdf}
-    \label{fig:MulTCP-2M-TestbedTrace}
     \caption{MulTCP拟真实验流带宽动态图}
+    \label{fig:MulTCP-2M-TestbedTrace}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{MulTCP-2M-Testbed-Summary.pdf}
-    \label{fig:MulTCP-2M-TestbedSum}
     \caption{MulTCP拟真实验流总带宽动统计图}
+    \label{fig:MulTCP-2M-TestbedSum}
   \end{subfigure}
   \begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Trace.pdf}
-    \label{fig:EWTCP-2M-TestbedTrace}
     \caption{EWTCP拟真实验流带宽动态图}
+    \label{fig:EWTCP-2M-TestbedTrace}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{EWTCP-2M-Testbed-Summary.pdf}
-    \label{fig:EWTCP-2M-TestbedSum}
     \caption{EWTCP拟真实验流总带宽动统计图}
+    \label{fig:EWTCP-2M-TestbedSum}
   \end{subfigure}
-  \label{fig:PreWorkTrace}
   \caption{两条权重分别为1和2的流使用分别使用MulTCP和EWTCP的拟真实验结果。带宽动态图中的target line是带权拥塞控制算法追求的目标线。}
+  \label{fig:PreWorkTrace}
 \end{figure}
 
 \textbf{带权拥塞控制算法在拟真实验环境中也可以实现加权公平性：}以WCC-AI为例，从图\ref{fig:TestbedExp}中的拟真实验结果可以看出，在拟真实验环境中WCC-AI也可以达到近乎完美的加权公平性并在长期中保持着良好的稳定性。
@@ -618,26 +592,26 @@ EWTCP也有相同的表现，WCC-AI受到的影响相对没有那么剧烈，但
   \begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{MulTCP-ThroughputVar.pdf}
-    \label{fig:MulTCP-ThroughputVar}
     \caption{两条MulTCP流带宽随交换机缓冲区大小变化图}
+    \label{fig:MulTCP-ThroughputVar}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{MulTCP-RatioVar.pdf}
-    \label{fig:MulTCP-RatioVar}
     \caption{两条MulTCP流带宽比值随交换机缓冲区大小变化图}
+    \label{fig:MulTCP-RatioVar}
   \end{subfigure}	
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{EWTCP-ThroughputVar.pdf}
-    \label{fig:EWTCP-ThroughputVar}
     \caption{两条EWTCP流带宽随交换机缓冲区大小变化图}
+    \label{fig:EWTCP-ThroughputVar}
   \end{subfigure}
 	\begin{subfigure}{.5\textwidth}
     \centering
 		\includegraphics[width=2.3in]{EWTCP-RatioVar.pdf}
-    \label{fig:EWTCP-RatioVar}
     \caption{两条EWTCP流带宽比值随交换机缓冲区大小变化图}
+    \label{fig:EWTCP-RatioVar}
   \end{subfigure}
 	\caption{权重分别为1和2的两条MulTCP和EWTCP流的带宽及其比值随交换机缓冲区大小变化图。}
 	\label{fig:PreWorkVar}
