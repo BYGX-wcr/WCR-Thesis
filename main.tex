@@ -82,7 +82,7 @@
 
 % 论文的中文摘要
 \begin{abstract}
-  拥塞控制是传输层协议TCP（Transmission Control Protocol）的核心组成部分。一般的拥塞控制算法追求公平性，即希望能在每一条参与竞争的网络流中平均分配带宽。而带权拥塞控制（又称加权拥塞控制）算法则是普通拥塞控制算法的拓展，其试图用端到端的方式来在TCP流中按流的权重来分配带宽。计算机网络界的前辈们已经提出了两种著名的带权拥塞控制算法——MulTCP和EWTCP。由于基于加增乘减的拥塞控制算法的公平性最易于掌控，所以这两种算法均是希望通过调整TCP流的加增乘减机制来实现加权公平性。然而在科研实验中，我发现这些经典的加权拥塞控制算法并不总是能很好地按权重来分配带宽。事实上，在不同的环境条件下它们的表现会出现极大的区别。在本论文中，我将会呈现MulTCP和EWTCP两种加权拥塞控制算法的仿真实验结果，并分析其行为和性能变化。我会用实验数据说明加权拥塞控制算法的性能实际上会受到交换机缓冲区大小和链路传播时延的严重影响。最后，我总结出了这两种加权拥塞控制算法的表现随环境因素变化的规律。
+  拥塞控制是传输层协议TCP（Transmission Control Protocol）的核心组成部分。一般的拥塞控制算法追求公平性，即希望能在每一条参与竞争的网络流中平均分配带宽。而带权拥塞控制（又称加权拥塞控制）算法则是普通拥塞控制算法的拓展，其试图用端到端的方式来在TCP流中按流的权重来分配带宽。计算机网络界的前辈们已经提出了两种著名的带权拥塞控制算法——MulTCP和EWTCP。由于基于加增乘减的拥塞控制算法的公平性最易于掌控，所以这两种算法均是希望通过调整TCP流的加增乘减机制来实现加权公平性。然而在科研实验中，我发现这些经典的带权拥塞控制算法并不总是能很好地按权重来分配带宽。事实上，在不同的环境条件下它们的表现会出现极大的区别。在本论文中，我将会呈现MulTCP和EWTCP以及其它两种代表性的带权拥塞控制算法的仿真和拟真实验结果，并分析其行为和性能变化。我会用实验数据说明带权拥塞控制算法的性能实际上会受到交换机缓冲区大小和链路传播时延的严重影响。最后，我总结出了这基于加增乘减的带权拥塞控制算法的表现随环境因素变化的规律。
 % 同时应该注意到，空白页是故意留白，以便章节开头能够出现在偶数页。
 % 中文关键词。关键词之间用中文全角分号隔开，末尾无标点符号。
 \keywords{拥塞控制；带宽分配；加权公平性}
@@ -91,7 +91,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 论文的英文摘要
 \begin{englishabstract}
-  Congestion Control is one of the critical components of TCP (Transmission Control Protocol). Normal congestion control algorithms aim to achieve fairness among all competing flows, which means they usually try to allocate a fair share of the link capacity to each flow. Weighted congestion control algorithms are extensions of the normal versions. Basically speaking, weighted congestion control algorithms aim at using end-to-end mechanisms to allocate bandwidth proportionally according to flows’ weights. MulTCP and EWTCP are two representative schemes of weighted congestion control algorithms. Since the fairness of AIMD-based congestion control algorithms is most comprehensible, both of the schemes attempt to achieve weighted proportionality via modifying the behavior of AIMD (Additive Increase Multiplicative Decrease). However, in real experiments, I find that those weighted congestion control algorithms have variable performance in different circumstances. In fact, their performance with regard to weighted proportionality fluctuates drastically in various network environments. In this paper, I present the simulation results of MulTCP as well as EWTCP and analyze the variation of their behaviors and performance. I show that both switch buffer size and propagation delay can significantly affect the performance of AIMD-based weighted congestion control algorithms, while these environmental parameters do not influence flows’ behaviors. Finally, I conclude the pattern of weighted congestion control algorithms’ performance variation. 
+  Congestion Control is one of the critical components of TCP (Transmission Control Protocol). Normal congestion control algorithms aim to achieve fairness among all competing flows, which means they usually try to allocate a fair share of the link capacity to each flow. Weighted congestion control algorithms are extensions of the normal versions. Basically speaking, weighted congestion control algorithms aim at using end-to-end mechanisms to allocate bandwidth proportionally according to flows’ weights. MulTCP and EWTCP are two representative schemes of weighted congestion control algorithms. Since the fairness of AIMD-based congestion control algorithms is most comprehensible, both of the schemes attempt to achieve weighted proportionality via modifying the behavior of AIMD (Additive Increase Multiplicative Decrease). However, in real experiments, I find that those weighted congestion control algorithms have variable performance in different circumstances. In fact, their performance with regard to weighted proportionality fluctuates drastically in various network environments. In this paper, I present the simulation results of MulTCP, EWTCP as well as other two representative weighted congestion control schemes and analyze the variation of their behaviors and performance. I show that both switch buffer size and propagation delay can significantly affect the performance of AIMD-based weighted congestion control algorithms, while these environmental parameters do not influence flows’ behaviors. Finally, I conclude the pattern of weighted congestion control algorithms’ performance variation. 
 % 英文关键词。关键词之间用英文半角逗号隔开，末尾无符号。
 \englishkeywords{Congestion Control, Bandwidth Allocation, Weighted Fairness}
 \end{englishabstract}
@@ -162,14 +162,14 @@ MPTCP\cite{wischik2011design}中也使用带权拥塞控制来控制每条路径
 前几年提出的NUMFabric\cite{nagaraj2016numfabric}和Faircloud\cite{popa2012faircloud}均依赖于交换机上的WFQ来实现加权公平性。
 功能日渐强大的交换机确实可以帮助实现加权公平性，但对交换机的依赖也使得这些系统的部署受到了限制。
 由于网络节点总是要对网络的反馈作出回应，因此以加权拥塞控制为代表的端到端速率调整机制其实对于实现加权公平性更为普适。
-MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{wischik2011design}就是两种典型的基于AIMD的加权拥塞控制算法。
+MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{wischik2011design}就是两种典型的基于AIMD的带权拥塞控制算法。
 它们均通过在端上修改TCP拥塞控制的加增乘减机制来实现差异化带宽分配。
 MulTCP根据锯齿模型分析得出的结论\cite{Floyd1997Sawtooth}提出：对于权重为$w$的TCP流，其加增参数和乘减参数应当分别为$w$和$1-\frac{1}{2w}$。
 事实上MulTCP是存在问题的，因为其理论模型是基于每一条流拥塞窗口的变化均是高度同步这一假设的，而这个假设是不符合实际的。
 EWTCP的设计想法则是来自于TCP流带宽随机测量模型\cite{padhye1998modeling}，对于权重为$w$的TCP流，它在普通加增乘减的基础上将加增的参数改为$w^2$。
 EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进行较为准确地测量，但是这种模型没有将网络中动态变化的排队时延考虑进去。
 因此，当交换机中队列的长度发生改变时，这种模型就会与现实产生偏差。
-总的来说，MulTCP和EWTCP都只是提出了一种可能的加权拥塞控制算法，而这些算法都没有能够完美地实现加权公平性。
+总的来说，MulTCP和EWTCP都只是提出了一种可能的带权拥塞控制算法，而这些算法都没有能够完美地实现加权公平性。
 这主要是因为之前的这两份工作\cite{crowcroft1998differentiated}\cite{wischik2011design}都忽视了交换机缓冲区大小、传播时延和ACK选项对不同权重的流的影响。
 
 在这篇论文中，我首先会介绍带权拥塞控制算法的应用场景和具体用法，以展示带权拥塞控制的应用价值和重要性，点明我的研究动机。
@@ -184,7 +184,7 @@ EWTCP使用的模型在特定的情形下确实能够对单条TCP流的带宽进
 我还提出了一个观点：想要较好地对基于加增乘减的带权拥塞控制算法的加权公平性的变化规律进行理论建模，就需要创造出新的针对多条TCP流的带宽比进行建模的、涵盖重要网络环境参数的理论模型。
 不过由于时间精力有限，在本文中我就不进一步地讨论带权拥塞控制算法的理论建模了。
 
-本文旨在对几种代表性的加权拥塞控制算法进行实验和分析，以期总结出基于AIMD的加权拥塞控制算法的一些特性和规律，并最终提升人们对于加权拥塞控制算法的理解，帮助网络工程师们了解如何在实践中应用加权拥塞控制。本文的主要工作如下：
+本文旨在对几种代表性的带权拥塞控制算法进行实验和分析，以期总结出基于AIMD的带权拥塞控制算法的一些特性和规律，并最终提升人们对于带权拥塞控制算法的理解，帮助网络工程师们了解如何在实践中应用加权拥塞控制。本文的主要工作如下：
 \begin{enumerate}
 \item 对几种典型带权拥塞控制算法进行仿真和拟真实验
 
@@ -852,7 +852,7 @@ static u32 tcp_wreno_md_ssthresh(struct sock *sk)
 
 {\bf 控制策略：} 
 在同步反馈的假设下，Chiu和Jain分析了加增乘减（AIMD）、加增加减（AIAD）、乘增加减（MIAD）和乘增乘减（MIMD）等四种经典控制策略的高效性和公平性，并总结到只有AIMD能够在稳态时同时实现高效性和公平性\cite{chiu1989analysis}。
-此后，人们基于加增乘减的控制策略提出了大量的拥塞控制算法，并使得拥塞控制逐渐走向成熟，这其中就包含RAP~\cite{rejaie1999rap}， RLM~\cite{mccanne1996rlm}， LDA~\cite{sisalem1998lda}， Reno~\cite{jacobson1990modified}， Vegas~\cite{brakmo1995tcp}， NewReno~\cite{Henderson2012NewReno}等经典拥塞控制算法。
+此后，人们基于加增乘减的控制策略提出了大量的拥塞控制算法，并使得拥塞控制逐渐走向成熟，这其中就包含RAP~\cite{rejaie1999rap}， RLM~\cite{mccanne1996rlm}， LDA~\cite{sisalem1998lda}， Reno~\cite{jacobson1990modified}， NewReno~\cite{Henderson2012NewReno}等经典拥塞控制算法。
 当基于加增乘减的拥塞控制成熟以后，研究者们提出了通用加增乘减（General AIMD）\cite{yang2000general}和二项式拥塞控制（Binomial Congestion Control）\cite{bansal2001binomial}，希望以非线性的控制模型来泛化线性的控制策略。
 特别地，两种TCP友好的非线性控制策略——IIAD和SQRT被设计出来以用于实时流式应用\cite{bansal2001binomial}。
 General AIMD\cite{yang2000general}也阐述了类似的想法，但它主要关注AIMD的泛化。
@@ -860,24 +860,35 @@ General AIMD\cite{yang2000general}也阐述了类似的想法，但它主要关�
 
 {\bf 拥塞控制: }
 TCP一般利用丢包\cite{jacobson1990modified,Henderson2012NewReno,ha2008cubic}、往返时间变化\cite{brakmo1995tcp,cardwell2016bbr,arun2018copa,Zeng2019cc}等网络信号来对潜在的网络拥塞做出响应。
-DCTCP\cite{alizadeh2010data,alizadeh2011analysis}通过在乘减阶段结合ECN机制，为数据中心网络提供了一种传输速率更为平滑的拥塞控制算法。
-为了解决新型高性能网络中的拥塞问题，人们近年来提出了DCQCN\cite{zhu2015congestion}、Timely\cite{mittal2015timely}和HPCC\cite{li2019hpcc}三种新型的低时延拥塞控制算法。
-其中，DCQCN结合了QCN\cite{pan2007qcn}和DCTCP\cite{alizadeh2010data}的优点，Timely结合了传统的基于时延的拥塞控制算法思想和新型网卡的特性，HPCC则充分利用了新型可编程交换机的功能。
+NewReno\cite{Henderson2012NewReno}和CUBIC\cite{ha2008cubic}是目前最为广泛使用的两种拥塞控制算法。
+它们均是以丢包作为拥塞信号的，这种方法的好处在于其适应性非常好，也就是说它们可以适应世界上的绝大多数网络环境。
+此外，这两种算法都可以被拓展为带权拥塞控制，不过由于CUBIC的公平性的理论解释不如NewReno这种基于加增乘减的拥塞控制算法那么完善，所以其被改造为带权拥塞控制后的加权公平性更加难以琢磨。
+分析和捕捉加权版CUBIC算法的工作我就留给未来的研究工作了。
+Vegas\cite{brakmo1995tcp}是早期最出名的基于网络测量并以往返时间变化作为拥塞信号的拥塞控制算法，然而它存在着一定的适应性问题，最终导致其没能在网络中被广泛使用。
+BBR\cite{cardwell2016bbr}是近几年被提出的一种新型的基于测量的拥塞控制算法，其综合了近二十年来拥塞控制算法发展的经验，具有对丢包不敏感、抗干扰、高性能等特点。
+BBR在推出后便广受欢迎，这主要是因为在网络发生严重的丢包时，它传统的基于丢包的拥塞控制算法能获得更多的带宽。
+然而BBR的公平性比较差，而且由于其整个理论体系尚未构建完全，它的公平性的可理解性也比较差，所以暂时很难用它来构建带权拥塞控制。
+DCTCP\cite{alizadeh2010data,alizadeh2011analysis}通过在乘减阶段的计算中结合ECN机制产生的拥塞因子，为数据中心网络提供了一种传输速率更为平滑的拥塞控制算法。
+DCTCP的理论模型与传统的基于加增乘减的拥塞控制算法基本相同，因此我相信在找到合适的数学分析方法来对带权拥塞控制的加权公平性进行建模后，DCTCP也一定可以被改造成带权拥塞控制，而且这样一来就可以为数据中心网络提供更适应该场景的带权拥塞控制算法了。
+为了解决新型RDMA（Remote Direct Memory Access，远程内存直接访问机制）高性能网络中的拥塞问题，人们近年来提出了DCQCN\cite{zhu2015congestion}、Timely\cite{mittal2015timely}和HPCC\cite{li2019hpcc}三种新型的低时延拥塞控制算法。
+其中，DCQCN结合了交换机上的QCN机制\cite{pan2007qcn}和DCTCP算法\cite{alizadeh2010data}的优点，Timely结合了传统的基于时延的拥塞控制算法思想和新型网卡的特性，HPCC则充分利用了新型可编程交换机的网络测量功能。
+不过由于现在RDMA网络中的基本性能问题还比较多，暂时还没人去关注这几种拥塞控制算法的公平性。
 最近，还有人提出了使用时下最热的机器学习算法来实现细粒度的拥塞控制，其中的典型代表是Remy\cite{winstein2013remy}和PCC Vivace\cite{dong2018pcc}。
-虽然这么多年来，人们不断地提出了上述种种日益新奇的拥塞控制算法，但是这些工作都是在追求公平性以及高带宽和低时延。
-它们都没有关注过应该如何实现拥塞控制算法的加权公平性。
+它们中的部分方案甚至提出自己也可以实现带权拥塞控制，不过这一说法并未得到实验的证实，而且它们的公平性也得比较缺乏可理解性，难以进行分析。
+虽然这么多年来，人们不断地提出了上述种种日益新奇的拥塞控制算法，但是这些工作的基本目标都是在追求高带宽和低时延等性能方面的进步，它们都没有关注过应该如何将拥塞控制算法的公平性拓展到加权公平性。
+某些算法为了获得较好的性能，甚至可以牺牲掉一些基本的公平性要求，如公平性收敛速度、公平性稳定程度等。
+
 
 {\bf 加权公平性: }
 公平性是一个历史悠久的概念，在其之下还有许多不同的具体子概念。
 Max-min Fairness\cite{bertsekas1992data,jaffe1981bottleneck}和Proportional Fairness\cite{kelly1998rate}就是最著名的两种具体定义的公平性，它们还可以拓展到一个更普适的公平性定义——$\alpha$-fairness\cite{mo2000fair}。
-%These works all present fundamental theories about how to share network bandwidth resources.
-%Nevertheless, though they provide some guides for designing bandwidth sharing policy of weighted congestion control, they don't give any analysis and solution about how to implement them.
-随着网络由free-use模型演化到pay-for-use模型，公平性原则便逐渐被拓展到了加权公平性，即在“公平地”分配资源时要参照各个竞争者的权重。
+这几份工作虽然都提出了相当成熟的带宽分配理论体系，但是在实现上它们都只是给出了一些策略设计方面的指导，并没有给出具体的实现方案和相应的分析。
+随着网络由free-use模型演化到pay-for-use模型，公平性原则便逐渐被拓展到了加权公平性，因此带权版的Max-min Fairness\cite{popa2012faircloud}和Proportional Fairness\cite{crowcroft1998differentiated}也被人们提出来作为带宽分配系统的设计准则。
 MulTCP\cite{crowcroft1998differentiated}和EWTCP\cite{Honda2009EWTCP}均试图通过修改AIMD的具体行为来实现流级的加权公平性。
-Faircloud\cite{popa2012faircloud}尝试基于Weighted Fair Queuing\cite{demers1989analysis,Abhay1993WFQ}来实现网络级的加权公平性
-NUMFabric\cite{nagaraj2016numfabric}和DGD\cite{low1999DGD}则设计了复杂的、需要特定交换机支持的分布式优化算法，以实现包括加权公平性在内的一般化的网络带宽分配。
-一份最近的工作Minerva\cite{Nathan2019wcubic}基于CUBIC\cite{ha2008cubic}和FAST\cite{chen2004fast}实现了带权拥塞控制，并希望利用它来实现用户体验质量的公平性。
-此外，Multipath TCP\cite{wischik2011design,lu2018multi}也提到了需要使用带权拥塞控制来控制细粒度的带宽分配。
+Faircloud\cite{popa2012faircloud}尝试基于Weighted Fair Queuing\cite{demers1989analysis,Abhay1993WFQ}来实现网络级的加权公平性，但是它提出的三个带宽分配系统的拓展性均面临着严重的硬件瓶颈。
+NUMFabric\cite{nagaraj2016numfabric}和DGD\cite{low1999DGD}则设计了复杂的、需要特定交换机支持的分布式优化算法，以实现包括加权公平性在内的一般化的网络带宽分配，然而这种设计过于超前和繁杂，目前仍然无法投入实际应用。
+一份最近的工作Minerva\cite{Nathan2019wcubic}基于CUBIC\cite{ha2008cubic}和FAST\cite{chen2004fast}实现了带权拥塞控制，并利用它来控制每条流的带宽，最终实现用户体验质量的公平性。
+此外，Multipath TCP\cite{wischik2011design,lu2018multi}等多路径拥塞控制方面的工作也提到了需要使用带权拥塞控制来实现细粒度的带宽分配。
 
 \chapter{总结}\label{chapter:conclusion}
 
